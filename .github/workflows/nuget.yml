@@ -50,8 +50,8 @@ jobs:
             echo "run_publish=false" >> $GITHUB_ENV
           fi
 
-      - name: Build the project and source generator
-        run: dotnet build SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-restore
+      - name: Build the project
+        run: dotnet build SimpleDataGrid/SimpleDataGrid.csproj --configuration Release
 
       - name: Pack the NuGet package
         run: dotnet pack SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-build --output ./nupkg
