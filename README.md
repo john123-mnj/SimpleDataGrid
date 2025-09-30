@@ -51,6 +51,10 @@ Install-Package SimpleDataGrid
             <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
             <Button Content="Search" Click="SearchButton_Click" Margin="5" />
             <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
+
+            <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
+            <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
+            <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5" />
         </StackPanel>
 
         <local:PersonPagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
@@ -90,6 +94,53 @@ public partial class MainWindow : Window
     {
         var viewModel = (MainViewModel)DataContext;
         viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
+    }
+
+    private void FilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        if (int.TryParse(MinAgeTextBox.Text, out var minAge))
+        {
+            viewModel.ApplyFilter(minAge);
+        }
+    }
+
+    private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.ClearFilter();
+    }
+}
+
+public class MainViewModel
+{
+    public PagedCollection<Person> People { get; }
+
+    public MainViewModel()
+    {
+        People = new PagedCollection<Person>(10);
+        People.SetSource(GetPeople());
+    }
+
+    private static List<Person> GetPeople()
+    {
+        var people = new List<Person>();
+        for (var i = 1; i <= 100; i++)
+        {
+            people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50) });
+        }
+        return people;
+    }
+
+    public void ApplyFilter(int minAge)
+    {
+        People.ClearFilters();
+        People.AddFilter(p => p.Age >= minAge);
+    }
+
+    public void ClearFilter()
+    {
+        People.ClearFilters();
     }
 }
 ```

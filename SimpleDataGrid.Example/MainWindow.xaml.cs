@@ -24,6 +24,21 @@ public partial class MainWindow : Window
         var viewModel = (MainViewModel)DataContext;
         viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
     }
+
+    private void FilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        if (int.TryParse(MinAgeTextBox.Text, out var minAge))
+        {
+            viewModel.ApplyFilter(minAge);
+        }
+    }
+
+    private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.ClearFilter();
+    }
 }
 
 public class PersonPagedDataGrid : PagedDataGrid<Person>;

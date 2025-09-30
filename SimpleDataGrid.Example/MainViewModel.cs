@@ -21,6 +21,17 @@ public class MainViewModel
         }
         return people;
     }
+
+    public void ApplyFilter(int minAge)
+    {
+        People.ClearFilters();
+        People.AddFilter(p => p.Age >= minAge);
+    }
+
+    public void ClearFilter()
+    {
+        People.ClearFilters();
+    }
 }
 
 public class Person

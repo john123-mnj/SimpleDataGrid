@@ -21,6 +21,10 @@
             <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
             <Button Content="Search" Click="SearchButton_Click" Margin="5" />
             <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
+
+            <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
+            <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
+            <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5" />
         </StackPanel>
 
         <local:PersonPagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />

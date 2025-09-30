@@ -73,7 +73,7 @@ public class PagedCollectionTests
         Assert.AreEqual(1, pagedCollection.CurrentPage);
         Assert.IsTrue(pagedCollection.HasNext);
         Assert.IsFalse(pagedCollection.HasPrevious);
-        CollectionAssert.AreEqual(new List<int> { 1, 2 }, (List<int>)pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<int> { 1, 2 }, pagedCollection.CurrentPageItems.ToList());
 
         // Act: Move to next page
         pagedCollection.NextPage();
@@ -82,7 +82,7 @@ public class PagedCollectionTests
         Assert.AreEqual(2, pagedCollection.CurrentPage);
         Assert.IsTrue(pagedCollection.HasNext);
         Assert.IsTrue(pagedCollection.HasPrevious);
-        CollectionAssert.AreEqual(new List<int> { 3, 4 }, (List<int>)pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<int> { 3, 4 }, pagedCollection.CurrentPageItems.ToList());
 
         // Act: Move to next page again (last page)
         pagedCollection.NextPage();
@@ -91,7 +91,7 @@ public class PagedCollectionTests
         Assert.AreEqual(3, pagedCollection.CurrentPage);
         Assert.IsFalse(pagedCollection.HasNext);
         Assert.IsTrue(pagedCollection.HasPrevious);
-        CollectionAssert.AreEqual(new List<int> { 5, 6 }, (List<int>)pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<int> { 5, 6 }, pagedCollection.CurrentPageItems.ToList());
 
         // Act: Try to move next beyond last page (should do nothing)
         pagedCollection.NextPage();
