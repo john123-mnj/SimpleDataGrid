@@ -104,7 +104,7 @@ public class PagedCollectionTests
         Assert.AreEqual(2, pagedCollection.CurrentPage);
         Assert.IsTrue(pagedCollection.HasNext);
         Assert.IsTrue(pagedCollection.HasPrevious);
-        CollectionAssert.AreEqual(new List<int> { 3, 4 }, (List<int>)pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<int> { 3, 4 }, pagedCollection.CurrentPageItems.ToList());
 
         // Act: Move to previous page again (first page)
         pagedCollection.PreviousPage();
@@ -113,7 +113,7 @@ public class PagedCollectionTests
         Assert.AreEqual(1, pagedCollection.CurrentPage);
         Assert.IsTrue(pagedCollection.HasNext);
         Assert.IsFalse(pagedCollection.HasPrevious);
-        CollectionAssert.AreEqual(new List<int> { 1, 2 }, (List<int>)pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<int> { 1, 2 }, pagedCollection.CurrentPageItems.ToList());
 
         // Act: Try to move previous beyond first page (should do nothing)
         pagedCollection.PreviousPage();

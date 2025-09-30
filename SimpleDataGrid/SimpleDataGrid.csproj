@@ -11,9 +11,9 @@
 	<Version>0.8.1</Version>
 	<Authors>Derek Gooding</Authors>
 	<Company>Derek Gooding</Company>
-	<PackageDescription>A simple DataGrid that supports pagination, filtering, and searching.</PackageDescription>
-	<RepositoryUrl>https://github.com/your-username/SimpleDataGrid</RepositoryUrl>
-	<PackageTags>wpf datagrid pagination filtering searching</PackageTags>
+	<PackageDescription>A powerful and simple DataGrid for WPF applications, offering seamless pagination, advanced filtering, and robust searching capabilities. Easily integrate and manage large datasets with a modern UI.</PackageDescription>
+	<RepositoryUrl>https://github.com/DerekGooding/SimpleDataGrid</RepositoryUrl>
+	<PackageTags>wpf datagrid pagination filtering searching .net .net-framework .net-core c# ui ux control component</PackageTags>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
