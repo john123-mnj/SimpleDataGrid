@@ -49,18 +49,12 @@ jobs:
             echo "No new version detected"
             echo "run_publish=false" >> $GITHUB_ENV
           fi
-            
-
-      - name: Restore dependencies
-        run: dotnet restore
 
       - name: Build the project and source generator
-        run: |
-          dotnet build SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-restore
+        run: dotnet build SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-restore
 
       - name: Pack the NuGet package
-        run: |
-          dotnet pack SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-build --output ./nupkg
+        run: dotnet pack SimpleDataGrid/SimpleDataGrid.csproj --configuration Release --no-build --output ./nupkg
 
       - name: Publish to NuGet
         if: env.run_publish == 'true'
