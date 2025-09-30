@@ -1,19 +1,54 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+	<TargetFrameworks>net9.0-windows;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
+	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 	<PackageId>SimpleDataGrid</PackageId>
-	<Version>1.0.0</Version>
-	<Authors>Your Name</Authors>
-	<Company>Your Company</Company>
+	<Version>0.8.0</Version>
+	<Authors>Derek Gooding</Authors>
+	<Company>Derek Gooding</Company>
 	<PackageDescription>A simple DataGrid that supports pagination, filtering, and searching.</PackageDescription>
 	<RepositoryUrl>https://github.com/your-username/SimpleDataGrid</RepositoryUrl>
 	<PackageTags>wpf datagrid pagination filtering searching</PackageTags>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageProjectUrl>https://github.com/DerekGooding/SimpleDataGrid</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/DerekGooding/SimpleDataGrid</RepositoryUrl>
+	<PackageBugTrackerUrl>https://github.com/DerekGooding/SimpleDataGrid/issues</PackageBugTrackerUrl>
+	<RepositoryType>git</RepositoryType>
+	<RepositoryBranch>main</RepositoryBranch>
+	<RepositoryCommit>$(GitCommitId)</RepositoryCommit>
+
+	<PackageIcon>Icon.png</PackageIcon>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<DocumentationFile>bin\SimpleDataGrid.xml</DocumentationFile>
+
+	<Copyright>Copyright © Derek Gooding 2025</Copyright>
+	<Product>SimpleDataGrid</Product>
+	<AssemblyTitle>SimpleDataGrid - A simple DataGrid that supports pagination, filtering, and searching</AssemblyTitle>
+	<AssemblyDescription>$(Description)</AssemblyDescription>
+	<NeutralLanguage>en-US</NeutralLanguage>
+
+	<DevelopmentDependency>false</DevelopmentDependency>
+	<IsTool>false</IsTool>
+
+	<PackageType>Dependency</PackageType>
+	<MinClientVersion>4.1.0</MinClientVersion>
+	<RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+	  
+	  
+	  
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\Icon.png" Pack="true" PackagePath="" />
+		<None Include="..\README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
 
 </Project>
