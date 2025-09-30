@@ -27,7 +27,7 @@ jobs:
       - name: Get the latest published version from NuGet
         id: get_latest_version
         run: |
-          LATEST_VERSION=$(curl -s "https://api.nuget.org/v3-flatcontainer/SimpleDataGrid/index.json" | jq -r '.versions[-1]')
+          LATEST_VERSION=$(curl -s "https://api.nuget.org/v3-flatcontainer/SimpleDataGrid/index.json" | jq -r '.versions[0]')
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 
       - name: Compare versions
