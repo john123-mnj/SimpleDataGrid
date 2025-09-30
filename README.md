@@ -1,7 +1,4 @@
-
-# SimpleDataGrid
-
-![Icon](Icon.png)
+# <img src="https://github.com/DerekGooding/SimpleInjection/blob/main/Icon.png" width=50 height=50/> SimpleDataGrid 
 
 A simple DataGrid for WPF that supports pagination, filtering, and searching.
 
