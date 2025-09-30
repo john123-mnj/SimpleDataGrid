@@ -28,9 +28,15 @@ jobs:
         id: get_latest_version
         run: |
           echo "Debugging curl output for NuGet versions:"
-          curl_output=$(curl -s "https://api.nuget.org/v3-flatcontainer/SimpleDataGrid/index.json")
-          echo "$curl_output"
-          LATEST_VERSION=$(echo "$curl_output" | jq -r '.versions[0]')
+          HTTP_CODE=$(curl -s -o curl_output.txt -w "%{http_code}" "https://api.nuget.org/v3-flatcontainer/SimpleDataGrid/index.json")
+          echo "HTTP Status Code: $HTTP_CODE"
+          cat curl_output.txt
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            LATEST_VERSION=$(cat curl_output.txt | jq -r '.versions[0]')
+          else
+            echo "Curl failed or returned non-200 status. Assuming no previous version."
+            LATEST_VERSION=""
+          fi
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 
       - name: Compare versions
