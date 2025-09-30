@@ -1,5 +1,5 @@
-
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace SimpleDataGrid.Pagination;
 
@@ -17,6 +17,7 @@ public class PagedCollection<T> : INotifyPropertyChanged
     private readonly List<Func<T, bool>> _filters = [];
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
+    private bool _useWildcards;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedCollection{T}"/> class.
@@ -62,10 +63,12 @@ public class PagedCollection<T> : INotifyPropertyChanged
     /// </summary>
     /// <param name="selector">A function that returns the string representation of the object to search.</param>
     /// <param name="term">The search term.</param>
-    public void SetSearch(Func<T, string> selector, string? term)
+    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
+    public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false)
     {
         _searchSelector = selector;
         _searchTerm = term;
+        _useWildcards = useWildcards;
         ApplyFiltering();
     }
 
@@ -80,15 +83,26 @@ public class PagedCollection<T> : INotifyPropertyChanged
 
         if (!string.IsNullOrWhiteSpace(_searchTerm) && _searchSelector != null)
         {
-            query = query.Where(x =>
-                _searchSelector(x)
-                    ?.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) == true);
+            if (_useWildcards)
+            {
+                var regex = new Regex(WildcardToRegex(_searchTerm), RegexOptions.IgnoreCase);
+                query = query.Where(x => regex.IsMatch(_searchSelector(x)));
+            }
+            else
+            {
+                query = query.Where(x =>
+                    _searchSelector(x)
+                        ?.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) == true);
+            }
         }
 
         _filtered = [.. query];
         _currentPage = 0;
         RaiseAllChanged();
     }
+
+    private static string WildcardToRegex(string pattern)
+        => "^" + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$";
 
     /// <summary>
     /// Gets the items on the current page.

@@ -1,6 +1,4 @@
-
 using SimpleDataGrid.Pagination;
-using System.Collections.Generic;
 
 namespace SimpleDataGrid.Example;
 
@@ -14,10 +12,10 @@ public class MainViewModel
         People.SetSource(GetPeople());
     }
 
-    private List<Person> GetPeople()
+    private static List<Person> GetPeople()
     {
         var people = new List<Person>();
-        for (int i = 1; i <= 100; i++)
+        for (var i = 1; i <= 100; i++)
         {
             people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50) });
         }
