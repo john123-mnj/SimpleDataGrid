@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace SimpleDataGrid.Pagination;
 
@@ -6,10 +6,10 @@ public class PagedCollection<T> : INotifyPropertyChanged
 {
     private readonly int _pageSize;
     private int _currentPage;
-    private IReadOnlyList<T> _source = Array.Empty<T>();
-    private IReadOnlyList<T> _filtered = Array.Empty<T>();
+    private IReadOnlyList<T> _source = [];
+    private IReadOnlyList<T> _filtered = [];
 
-    private Func<T, bool> _filter = _ => true;
+    private readonly List<Func<T, bool>> _filters = [];
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
 
@@ -25,9 +25,15 @@ public class PagedCollection<T> : INotifyPropertyChanged
         ApplyFiltering();
     }
 
-    public void SetFilter(Func<T, bool> filter)
+    public void AddFilter(Func<T, bool> filter)
     {
-        this._filter = filter ?? (_ => true);
+        _filters.Add(filter);
+        ApplyFiltering();
+    }
+
+    public void ClearFilters()
+    {
+        _filters.Clear();
         ApplyFiltering();
     }
 
@@ -40,7 +46,12 @@ public class PagedCollection<T> : INotifyPropertyChanged
 
     private void ApplyFiltering()
     {
-        var query = _source.Where(_filter);
+        IEnumerable<T> query = _source;
+
+        foreach (var filter in _filters)
+        {
+            query = query.Where(filter);
+        }
 
         if (!string.IsNullOrWhiteSpace(_searchTerm) && _searchSelector != null)
         {
@@ -49,13 +60,13 @@ public class PagedCollection<T> : INotifyPropertyChanged
                     ?.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) == true);
         }
 
-        _filtered = query.ToList();
+        _filtered = [.. query];
         _currentPage = 0;
         RaiseAllChanged();
     }
 
     public IReadOnlyList<T> CurrentPageItems =>
-        _filtered.Skip(_currentPage * _pageSize).Take(_pageSize).ToList();
+        [.. _filtered.Skip(_currentPage * _pageSize).Take(_pageSize)];
 
     public int CurrentPage => _currentPage + 1;
 

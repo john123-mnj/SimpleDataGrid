@@ -1,31 +1,34 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+
 using SimpleDataGrid.Pagination;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SimpleDataGrid.Controls;
 
-public class PagedDataGrid : DataGrid
+public class PagedDataGrid<T> : DataGrid
 {
     public static readonly DependencyProperty PagedSourceProperty =
-        DependencyProperty.Register(nameof(PagedSource), typeof(object), typeof(PagedDataGrid),
+        DependencyProperty.Register(nameof(PagedSource), typeof(PagedCollection<T>), typeof(PagedDataGrid<T>),
             new PropertyMetadata(null, OnPagedSourceChanged));
 
-    public object? PagedSource
+    public PagedCollection<T>? PagedSource
     {
-        get => GetValue(PagedSourceProperty);
+        get => (PagedCollection<T>)GetValue(PagedSourceProperty);
         set => SetValue(PagedSourceProperty, value);
     }
 
     private static void OnPagedSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is PagedDataGrid grid && e.NewValue is IPagedSource paged)
+        if (d is PagedDataGrid<T> grid && e.NewValue is PagedCollection<T> paged)
         {
             grid.ItemsSource = paged.CurrentPageItems;
+            paged.PropertyChanged += (s, a) =>
+            {
+                if (a.PropertyName == nameof(paged.CurrentPageItems))
+                {
+                    grid.ItemsSource = paged.CurrentPageItems;
+                }
+            };
         }
     }
-}
-
-public interface IPagedSource
-{
-    object CurrentPageItems { get; }
 }
