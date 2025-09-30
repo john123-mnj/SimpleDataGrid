@@ -8,6 +8,22 @@ A simple DataGrid for WPF that supports pagination, filtering, and searching.
 *   **Filtering:** Filter data based on custom criteria.
 *   **Searching:** Search for data using strings or wildcards.
 
+## Installation
+
+You can install the `SimpleDataGrid` NuGet package using either the .NET CLI or the NuGet Package Manager.
+
+### .NET CLI
+
+```bash
+dotnet add package SimpleDataGrid
+```
+
+### NuGet Package Manager
+
+```powershell
+Install-Package SimpleDataGrid
+```
+
 ## Usage
 
 1.  Install the `SimpleDataGrid` NuGet package.
