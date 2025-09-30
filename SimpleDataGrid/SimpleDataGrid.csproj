@@ -1,10 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
+
+	<PackageId>SimpleDataGrid</PackageId>
+	<Version>1.0.0</Version>
+	<Authors>Your Name</Authors>
+	<Company>Your Company</Company>
+	<PackageDescription>A simple DataGrid that supports pagination, filtering, and searching.</PackageDescription>
+	<RepositoryUrl>https://github.com/your-username/SimpleDataGrid</RepositoryUrl>
+	<PackageTags>wpf datagrid pagination filtering searching</PackageTags>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>

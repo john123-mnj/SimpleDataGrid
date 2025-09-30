@@ -1,7 +1,12 @@
+
 using System.ComponentModel;
 
 namespace SimpleDataGrid.Pagination;
 
+/// <summary>
+/// Represents a collection of items that can be paged, filtered, and searched.
+/// </summary>
+/// <typeparam name="T">The type of items in the collection.</typeparam>
 public class PagedCollection<T> : INotifyPropertyChanged
 {
     private readonly int _pageSize;
@@ -13,30 +18,50 @@ public class PagedCollection<T> : INotifyPropertyChanged
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PagedCollection{T}"/> class.
+    /// </summary>
+    /// <param name="pageSize">The number of items to display per page.</param>
     public PagedCollection(int pageSize = 50)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
         this._pageSize = pageSize;
     }
 
+    /// <summary>
+    /// Sets the source collection.
+    /// </summary>
+    /// <param name="items">The source collection.</param>
     public void SetSource(IReadOnlyList<T> items)
     {
         _source = items ?? throw new ArgumentNullException(nameof(items));
         ApplyFiltering();
     }
 
+    /// <summary>
+    /// Adds a filter to the collection.
+    /// </summary>
+    /// <param name="filter">The filter to add.</param>
     public void AddFilter(Func<T, bool> filter)
     {
         _filters.Add(filter);
         ApplyFiltering();
     }
 
+    /// <summary>
+    /// Clears all filters from the collection.
+    /// </summary>
     public void ClearFilters()
     {
         _filters.Clear();
         ApplyFiltering();
     }
 
+    /// <summary>
+    /// Sets the search criteria for the collection.
+    /// </summary>
+    /// <param name="selector">A function that returns the string representation of the object to search.</param>
+    /// <param name="term">The search term.</param>
     public void SetSearch(Func<T, string> selector, string? term)
     {
         _searchSelector = selector;
@@ -65,16 +90,35 @@ public class PagedCollection<T> : INotifyPropertyChanged
         RaiseAllChanged();
     }
 
+    /// <summary>
+    /// Gets the items on the current page.
+    /// </summary>
     public IReadOnlyList<T> CurrentPageItems =>
         [.. _filtered.Skip(_currentPage * _pageSize).Take(_pageSize)];
 
+    /// <summary>
+    /// Gets the current page number.
+    /// </summary>
     public int CurrentPage => _currentPage + 1;
 
+    /// <summary>
+    /// Gets the total number of pages.
+    /// </summary>
     public int TotalPages => (int)Math.Ceiling((double)_filtered.Count / _pageSize);
 
+    /// <summary>
+    /// Gets a value indicating whether there is a next page.
+    /// </summary>
     public bool HasNext => _currentPage < TotalPages - 1;
+
+    /// <summary>
+    /// Gets a value indicating whether there is a previous page.
+    /// </summary>
     public bool HasPrevious => _currentPage > 0;
 
+    /// <summary>
+    /// Moves to the next page.
+    /// </summary>
     public void NextPage()
     {
         if (HasNext)
@@ -87,6 +131,9 @@ public class PagedCollection<T> : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Moves to the previous page.
+    /// </summary>
     public void PreviousPage()
     {
         if (HasPrevious)
@@ -108,6 +155,9 @@ public class PagedCollection<T> : INotifyPropertyChanged
         OnPropertyChanged(nameof(HasPrevious));
     }
 
+    /// <summary>
+    /// Occurs when a property value changes.
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged(string name) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
