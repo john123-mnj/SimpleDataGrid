@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net9.0-windows;</TargetFrameworks>
+	<TargetFrameworks>net8.0-windows;net9.0-windows;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<UseWPF>true</UseWPF>
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 	<PackageId>SimpleDataGrid</PackageId>
-	<Version>0.8.0</Version>
+	<Version>0.8.1</Version>
 	<Authors>Derek Gooding</Authors>
 	<Company>Derek Gooding</Company>
 	<PackageDescription>A simple DataGrid that supports pagination, filtering, and searching.</PackageDescription>
