@@ -6,8 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SimpleDataGrid.Example"
         xmlns:controls="clr-namespace:SimpleDataGrid.Controls;assembly=SimpleDataGrid"
+        xmlns:converters="clr-namespace:SimpleDataGrid.Example.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <converters:ItemCountConverter x:Key="ItemCountConverter"/>
+    </Window.Resources>
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
@@ -31,11 +35,31 @@
         <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Previous" Click="PreviousButton_Click" Margin="5" />
-            <TextBlock Text="{Binding People.CurrentPage}" VerticalAlignment="Center" Margin="5" />
-            <TextBlock Text="/" VerticalAlignment="Center" />
-            <TextBlock Text="{Binding People.TotalPages}" VerticalAlignment="Center" Margin="5" />
-            <Button Content="Next" Click="NextButton_Click" Margin="5" />
+            <Button Content="First" Click="FirstButton_Click" Margin="5" IsEnabled="{Binding People.HasPrevious}"/>
+            <Button Content="Previous" Click="PreviousButton_Click" Margin="5" IsEnabled="{Binding People.HasPrevious}"/>
+            <TextBlock VerticalAlignment="Center" Margin="5">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Page {0} of {1}">
+                        <Binding Path="People.CurrentPage"/>
+                        <Binding Path="People.TotalPages"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <Button Content="Next" Click="NextButton_Click" Margin="5" IsEnabled="{Binding People.HasNext}"/>
+            <Button Content="Last" Click="LastButton_Click" Margin="5" IsEnabled="{Binding People.HasNext}"/>
+            <TextBlock Text="Go to page:" VerticalAlignment="Center" Margin="5,0,0,0"/>
+            <TextBox x:Name="PageTextBox" Width="30" Margin="5,0,0,0"/>
+            <Button Content="Go" Click="GoToPageButton_Click" Margin="5,0,0,0"/>
+            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource ItemCountConverter}">
+                        <Binding Path="People.CurrentPageItems.Count"/>
+                        <Binding Path="People.CurrentPage"/>
+                        <Binding Path="People.TotalItems"/>
+                        <Binding Path="People.PageSize"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Window>

@@ -12,6 +12,10 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
 {
     private readonly int _pageSize;
     private int _currentPage;
+    /// <summary>
+    /// Gets the number of items to display per page.
+    /// </summary>
+    public int PageSize => _pageSize;
     private IReadOnlyList<T> _source = [];
     private IReadOnlyList<T> _filtered = [];
 
@@ -174,7 +178,12 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <summary>
     /// Gets the total number of pages.
     /// </summary>
-    public int TotalPages => (int)Math.Ceiling((double)_filtered.Count / _pageSize);
+    public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)_filtered.Count / _pageSize));
+
+    /// <summary>
+    /// Gets the total number of items in the filtered collection.
+    /// </summary>
+    public int TotalItems => _filtered.Count;
 
     /// <summary>
     /// Gets a value indicating whether there is a next page.
@@ -214,6 +223,39 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             OnPropertyChanged(nameof(HasNext));
             OnPropertyChanged(nameof(HasPrevious));
         }
+    }
+
+    /// <summary>
+    /// Moves to a specific page.
+    /// </summary>
+    /// <param name="page">The page to move to.</param>
+    public void GoToPage(int page)
+    {
+        var newPage = Math.Clamp(page - 1, 0, TotalPages - 1);
+        if (newPage != _currentPage)
+        {
+            _currentPage = newPage;
+            OnPropertyChanged(nameof(CurrentPageItems));
+            OnPropertyChanged(nameof(CurrentPage));
+            OnPropertyChanged(nameof(HasNext));
+            OnPropertyChanged(nameof(HasPrevious));
+        }
+    }
+
+    /// <summary>
+    /// Moves to the first page.
+    /// </summary>
+    public void GoToFirstPage()
+    {
+        GoToPage(1);
+    }
+
+    /// <summary>
+    /// Moves to the last page.
+    /// </summary>
+    public void GoToLastPage()
+    {
+        GoToPage(TotalPages);
     }
 
     private void RaiseAllChanged()

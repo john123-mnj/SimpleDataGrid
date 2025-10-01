@@ -39,4 +39,25 @@ public partial class MainWindow : Window
         var viewModel = (MainViewModel)DataContext;
         viewModel.ClearFilter();
     }
+
+    private void FirstButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.People.GoToFirstPage();
+    }
+
+    private void LastButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.People.GoToLastPage();
+    }
+
+    private void GoToPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        if (int.TryParse(PageTextBox.Text, out var page))
+        {
+            viewModel.People.GoToPage(page);
+        }
+    }
 }
