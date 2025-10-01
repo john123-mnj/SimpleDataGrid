@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.IO;
+using System.Reflection;
 
 namespace SimpleDataGrid.Example;
 
@@ -77,6 +79,29 @@ public class AdvancedExamplesViewModel : INotifyPropertyChanged
         // This is a placeholder. A real implementation would parse the CustomFilterExpression
         // and create a Func<Person, bool> from it.
         People.SetFilter("customFilter", p => p.Age > 30);
+    }
+
+    public void ExportCurrentPageToCsv()
+    {
+        var items = People.CurrentPageItems;
+        if (!items.Any()) return;
+
+        var csv = new System.Text.StringBuilder();
+
+        // Add header row
+        var headers = typeof(Person).GetProperties().Select(p => p.Name);
+        csv.AppendLine(string.Join(",", headers));
+
+        // Add data rows
+        foreach (Person item in items)
+        {
+            var fields = typeof(Person).GetProperties().Select(p => p.GetValue(item)?.ToString() ?? string.Empty);
+            csv.AppendLine(string.Join(",", fields));
+        }
+
+        var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CurrentPage.csv");
+        System.IO.File.WriteAllText(filePath, csv.ToString());
+        System.Windows.MessageBox.Show($"Current page exported to {filePath}");
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

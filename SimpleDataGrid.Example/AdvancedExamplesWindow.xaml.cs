@@ -112,4 +112,10 @@ public partial class AdvancedExamplesWindow : Window
         var viewModel = (AdvancedExamplesViewModel)DataContext;
         viewModel.ApplyCustomFilter();
     }
+
+    private void ExportToCsvButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (AdvancedExamplesViewModel)DataContext;
+        viewModel.ExportCurrentPageToCsv();
+    }
 }
