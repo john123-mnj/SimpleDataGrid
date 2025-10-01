@@ -25,9 +25,9 @@
 
         <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
             <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
-                <Button Content="Search" Click="SearchButton_Click" Margin="5" />
+                <TextBox x:Name="SearchTextBox" Width="200" Margin="5" TextChanged="SearchTextBox_TextChanged"/>
                 <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
+                <ProgressBar IsIndeterminate="True" Width="20" Height="20" Margin="5" Visibility="{Binding People.IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />

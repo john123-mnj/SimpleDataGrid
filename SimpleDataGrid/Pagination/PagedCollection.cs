@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace SimpleDataGrid.Pagination;
 
@@ -33,11 +34,29 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
     private bool _useWildcards;
+    private System.Threading.Timer? _debounceTimer;
+    private bool _isSearching;
 
     /// <summary>
     /// Gets a value indicating whether the collection is sorted.
     /// </summary>
     public bool IsSorted => _sorts.Count > 0;
+
+    /// <summary>
+    /// Gets a value indicating whether a search operation is currently in progress.
+    /// </summary>
+    public bool IsSearching
+    {
+        get => _isSearching;
+        private set
+        {
+            if (_isSearching != value)
+            {
+                _isSearching = value;
+                OnPropertyChanged(nameof(IsSearching));
+            }
+        }
+    }
 
     /// <summary>
     /// Occurs when the sorting changes.
@@ -142,11 +161,38 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="selector">A function that returns the string representation of the object to search.</param>
     /// <param name="term">The search term.</param>
     /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
-    public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false)
+    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
+    public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
         _searchSelector = selector;
         _searchTerm = term;
         _useWildcards = useWildcards;
+
+        if (debounceMilliseconds > 0)
+        {
+            IsSearching = true;
+            _debounceTimer?.Dispose();
+            _debounceTimer = new System.Threading.Timer(_ =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFiltering);
+                IsSearching = false;
+            }, null, debounceMilliseconds, System.Threading.Timeout.Infinite);
+        }
+        else
+        {
+            ApplyFiltering();
+            SearchChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Clears the search criteria from the collection.
+    /// </summary>
+    public void ClearSearch()
+    {
+        _searchSelector = null;
+        _searchTerm = null;
+        _useWildcards = false;
         ApplyFiltering();
         SearchChanged?.Invoke(this, EventArgs.Empty);
     }

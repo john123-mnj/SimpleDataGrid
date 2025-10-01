@@ -20,10 +20,10 @@ public partial class MainWindow : Window
         viewModel.People.NextPage();
     }
 
-    private void SearchButton_Click(object sender, RoutedEventArgs e)
+    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         var viewModel = (MainViewModel)DataContext;
-        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
+        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
     }
 
     private void FilterButton_Click(object sender, RoutedEventArgs e)
