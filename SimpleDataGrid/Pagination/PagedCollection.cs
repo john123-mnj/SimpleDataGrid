@@ -249,6 +249,21 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public int TotalItems => _filtered.Count;
 
     /// <summary>
+    /// Gets a value indicating whether the filtered collection is empty.
+    /// </summary>
+    public bool IsEmpty => _filtered.Count == 0;
+
+    /// <summary>
+    /// Gets a value indicating whether the filtered collection has any items.
+    /// </summary>
+    public bool HasItems => _filtered.Count > 0;
+
+    /// <summary>
+    /// Gets a value indicating whether the original source collection is empty.
+    /// </summary>
+    public bool IsSourceEmpty => _source.Count == 0;
+
+    /// <summary>
     /// Gets a value indicating whether there is a next page.
     /// </summary>
     public bool HasNext => _currentPage < TotalPages - 1;
@@ -347,6 +362,9 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         OnPropertyChanged(nameof(TotalPages));
         OnPropertyChanged(nameof(HasNext));
         OnPropertyChanged(nameof(HasPrevious));
+        OnPropertyChanged(nameof(IsEmpty));
+        OnPropertyChanged(nameof(HasItems));
+        OnPropertyChanged(nameof(IsSourceEmpty));
     }
 
     /// <summary>

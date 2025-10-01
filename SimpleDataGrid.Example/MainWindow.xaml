@@ -11,6 +11,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <converters:ItemCountConverter x:Key="ItemCountConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
     <Window.DataContext>
         <local:MainViewModel />
@@ -55,6 +56,13 @@
         </StackPanel>
 
         <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
+
+        <Grid Grid.Row="1" Background="#AAFFFFFF" Visibility="{Binding People.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="No items found." FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="Try clearing your filters or search terms." FontSize="14" TextAlignment="Center"/>
+            </StackPanel>
+        </Grid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="First" Click="FirstButton_Click" Margin="5" IsEnabled="{Binding People.HasPrevious}"/>
