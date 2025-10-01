@@ -152,6 +152,10 @@ To run the example project:
 dotnet run --project SimpleDataGrid.Example
 ```
 
+## Performance
+
+For detailed information on performance characteristics and best practices, refer to the [PERFORMANCE.md](PERFORMANCE.md) document.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
