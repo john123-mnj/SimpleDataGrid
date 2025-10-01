@@ -469,7 +469,10 @@ public class PagedCollection<T> : IPagedCollection, IDisposable
     /// Gets a value indicating whether there is a previous page.
     /// </summary>
     public bool HasPrevious => _currentPage > 0;
-
+    /// <summary>
+    /// Gets the keys of the active filters.
+    /// </summary>
+    public IReadOnlyCollection<string> ActiveFilters => GetActiveFilters();
     /// <summary>
     /// Moves to the next page.
     /// </summary>
