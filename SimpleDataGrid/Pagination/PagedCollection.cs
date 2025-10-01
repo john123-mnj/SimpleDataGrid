@@ -16,9 +16,20 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     private IReadOnlyList<T> _filtered = [];
 
     private readonly List<Func<T, bool>> _filters = [];
+    private readonly List<(Func<T, object> selector, bool ascending)> _sorts = [];
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
     private bool _useWildcards;
+
+    /// <summary>
+    /// Gets a value indicating whether the collection is sorted.
+    /// </summary>
+    public bool IsSorted => _sorts.Count > 0;
+
+    /// <summary>
+    /// Occurs when the sorting changes.
+    /// </summary>
+    public event EventHandler? SortChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedCollection{T}"/> class.
@@ -73,6 +84,30 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         ApplyFiltering();
     }
 
+    /// <summary>
+    /// Sets the sort criteria for the collection.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key to sort by.</typeparam>
+    /// <param name="selector">A function to extract the key for sorting.</param>
+    /// <param name="ascending">A value indicating whether to sort in ascending order.</param>
+    public void SetSort<TKey>(Func<T, TKey> selector, bool ascending)
+    {
+        _sorts.Clear();
+        _sorts.Add((x => selector(x)!, ascending));
+        ApplyFiltering();
+        SortChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Clears the sort criteria from the collection.
+    /// </summary>
+    public void ClearSort()
+    {
+        _sorts.Clear();
+        ApplyFiltering();
+        SortChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     private void ApplyFiltering()
     {
         IEnumerable<T> query = _source;
@@ -95,6 +130,23 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
                     _searchSelector(x)
                         ?.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) == true);
             }
+        }
+
+        if (_sorts.Count > 0)
+        {
+            IOrderedEnumerable<T>? orderedQuery = null;
+            foreach (var (selector, ascending) in _sorts)
+            {
+                if (orderedQuery == null)
+                {
+                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
+                }
+                else
+                {
+                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
+                }
+            }
+            query = orderedQuery ?? query;
         }
 
         _filtered = [.. query];

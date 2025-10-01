@@ -25,6 +25,15 @@ public class PagedDataGrid : DataGrid
         set => SetValue(PagedSourceProperty, value);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PagedDataGrid"/> class.
+    /// </summary>
+    public PagedDataGrid()
+    {
+        Sorting += OnSorting;
+    }
+
+
     private static void OnPagedSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is PagedDataGrid grid && e.NewValue is IPagedCollection paged)
@@ -39,6 +48,13 @@ public class PagedDataGrid : DataGrid
             };
         }
     }
+
+    /// <summary>
+    /// Handles the <see cref="DataGrid.Sorting"/> event.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event data.</param>
+    protected virtual void OnSorting(object sender, DataGridSortingEventArgs e) { }
 }
 
 /// <summary>
@@ -55,4 +71,32 @@ public class PagedDataGrid<T> : PagedDataGrid
         get => (PagedCollection<T>?)base.PagedSource;
         set => base.PagedSource = value;
     }
+
+    /// <summary>
+    /// Handles the <see cref="DataGrid.Sorting"/> event.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event data.</param>
+    protected override void OnSorting(object sender, DataGridSortingEventArgs e)
+    {
+        if (PagedSource == null) return;
+
+        var direction = e.Column.SortDirection == System.ComponentModel.ListSortDirection.Ascending
+            ? System.ComponentModel.ListSortDirection.Descending
+            : System.ComponentModel.ListSortDirection.Ascending;
+
+        e.Column.SortDirection = direction;
+
+        var propertyName = e.Column.SortMemberPath;
+        if (string.IsNullOrEmpty(propertyName)) return;
+
+        var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
+        var property = System.Linq.Expressions.Expression.Property(parameter, propertyName);
+        var lambda = System.Linq.Expressions.Expression.Lambda<Func<T, object>>(System.Linq.Expressions.Expression.Convert(property, typeof(object)), parameter);
+
+        PagedSource.SetSort(lambda.Compile(), direction == System.ComponentModel.ListSortDirection.Ascending);
+
+        e.Handled = true;
+    }
+
 }
