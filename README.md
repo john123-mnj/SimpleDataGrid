@@ -1,4 +1,9 @@
-# <img src="https://github.com/DerekGooding/SimpleDataGrid/blob/main/Icon.png" width=50 height=50/> SimpleDataGrid 
+# SimpleDataGrid
+
+[![Build Status](https://github.com/dgooding/SimpleDataGrid/actions/workflows/tests.yml/badge.svg)](https://github.com/dgooding/SimpleDataGrid/actions/workflows/tests.yml)
+[![Open Issues](https://img.shields.io/github/issues/dgooding/SimpleDataGrid)](https://github.com/dgooding/SimpleDataGrid/issues)
+[![NuGet Version](https://img.shields.io/nuget/v/SimpleDataGrid)](https://www.nuget.org/packages/SimpleDataGrid/)
+[![API Docs](https://github.com/dgooding/SimpleDataGrid/actions/workflows/api-docs.yml/badge.svg)](https://github.com/dgooding/SimpleDataGrid/actions/workflows/api-docs.yml)
 
 A simple DataGrid for WPF that supports pagination, filtering, and searching.
 
