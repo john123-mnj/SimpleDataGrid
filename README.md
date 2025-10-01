@@ -4,9 +4,12 @@ A simple DataGrid for WPF that supports pagination, filtering, and searching.
 
 ## Features
 
-*   **Pagination:** Easily page through large datasets.
-*   **Filtering:** Filter data based on custom criteria.
-*   **Searching:** Search for data using strings or wildcards.
+*   **Pagination:** Easily page through large datasets, with navigation controls and page size selection.
+*   **Filtering:** Filter data based on custom criteria, including named filters for easy management.
+*   **Searching:** Search for data using strings, wildcards, and multi-column search with debouncing.
+*   **Sorting:** Sort data by clicking on column headers.
+*   **Empty State Support:** Provides clear feedback when no items are found after filtering or searching.
+*   **Observability Events:** Exposes events for page changes, filter changes, search changes, and sort changes.
 
 ## Installation
 
@@ -35,6 +38,7 @@ Install-Package SimpleDataGrid
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:SimpleDataGrid.Example"
+        xmlns:controls="clr-namespace:SimpleDataGrid.Controls;assembly=SimpleDataGrid"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.DataContext>
@@ -48,16 +52,13 @@ Install-Package SimpleDataGrid
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
+            <TextBox x:Name="SearchTextBox" Width="200" Margin="5" TextChanged="SearchTextBox_TextChanged"/>
             <Button Content="Search" Click="SearchButton_Click" Margin="5" />
             <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
-
-            <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
-            <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
-            <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5" />
+            <Button Content="Advanced Examples" Click="AdvancedExamplesButton_Click" Margin="5"/>
         </StackPanel>
 
-        <local:PersonPagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
+        <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Previous" Click="PreviousButton_Click" Margin="5" />
@@ -90,25 +91,22 @@ public partial class MainWindow : Window
         viewModel.People.NextPage();
     }
 
+    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
+    }
+
     private void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         var viewModel = (MainViewModel)DataContext;
         viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
     }
 
-    private void FilterButton_Click(object sender, RoutedEventArgs e)
+    private void AdvancedExamplesButton_Click(object sender, RoutedEventArgs e)
     {
-        var viewModel = (MainViewModel)DataContext;
-        if (int.TryParse(MinAgeTextBox.Text, out var minAge))
-        {
-            viewModel.ApplyFilter(minAge);
-        }
-    }
-
-    private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (MainViewModel)DataContext;
-        viewModel.ClearFilter();
+        var advancedExamplesWindow = new AdvancedExamplesWindow();
+        advancedExamplesWindow.Show();
     }
 }
 
@@ -127,22 +125,31 @@ public class MainViewModel
         var people = new List<Person>();
         for (var i = 1; i <= 100; i++)
         {
-            people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50) });
+            people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50), Email = $"person{i}@example.com", Department = (i % 2 == 0) ? "Sales" : "Marketing" });
         }
         return people;
     }
-
-    public void ApplyFilter(int minAge)
-    {
-        People.ClearFilters();
-        People.AddFilter(p => p.Age >= minAge);
-    }
-
-    public void ClearFilter()
-    {
-        People.ClearFilters();
-    }
 }
+
+public class Person
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Age { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public DateTime HireDate { get; set; }
+}
+
+## Example Project
+
+The `SimpleDataGrid.Example` project demonstrates various features of the `SimpleDataGrid` library. It includes a basic `MainWindow` for quick usage and an `AdvancedExamplesWindow` for showcasing more complex functionalities.
+
+To run the example project:
+
+```bash
+dotnet run --project SimpleDataGrid.Example
 ```
 
 ## License
