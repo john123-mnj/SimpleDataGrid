@@ -7,6 +7,7 @@ namespace SimpleDataGrid.Example;
 public class MainViewModel
 {
     public PagedCollection<Person> People { get; }
+    public List<int> PageSizes { get; } = [10, 25, 50, 100];
 
     public MainViewModel()
     {

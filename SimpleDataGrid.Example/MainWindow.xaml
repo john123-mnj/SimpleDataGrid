@@ -72,6 +72,7 @@
             <TextBlock Text="Go to page:" VerticalAlignment="Center" Margin="5,0,0,0"/>
             <TextBox x:Name="PageTextBox" Width="30" Margin="5,0,0,0"/>
             <Button Content="Go" Click="GoToPageButton_Click" Margin="5,0,0,0"/>
+            <ComboBox Margin="10,0,0,0" ItemsSource="{Binding PageSizes}" SelectedItem="{Binding People.PageSize}"/>
             <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
                 <TextBlock.Text>
                     <MultiBinding Converter="{StaticResource ItemCountConverter}">

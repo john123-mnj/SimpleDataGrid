@@ -10,12 +10,21 @@ namespace SimpleDataGrid.Pagination;
 /// <typeparam name="T">The type of items in the collection.</typeparam>
 public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
 {
-    private readonly int _pageSize;
+    private int _pageSize;
     private int _currentPage;
+
     /// <summary>
-    /// Gets the number of items to display per page.
+    /// Occurs when the page size changes.
     /// </summary>
-    public int PageSize => _pageSize;
+    public event EventHandler? PageSizeChanged;
+    /// <summary>
+    /// Gets or sets the number of items to display per page.
+    /// </summary>
+    public int PageSize
+    {
+        get => _pageSize;
+        set => SetPageSize(value);
+    }
     private IReadOnlyList<T> _source = [];
     private IReadOnlyList<T> _filtered = [];
 
@@ -293,6 +302,22 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public void GoToLastPage()
     {
         GoToPage(TotalPages);
+    }
+
+    /// <summary>
+    /// Sets the number of items to display per page.
+    /// </summary>
+    /// <param name="newSize">The new page size.</param>
+    public void SetPageSize(int newSize)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(newSize);
+
+        var oldFirstItemIndex = _currentPage * _pageSize;
+        _pageSize = newSize;
+        _currentPage = oldFirstItemIndex / _pageSize;
+
+        RaiseAllChanged();
+        PageSizeChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void RaiseAllChanged()
