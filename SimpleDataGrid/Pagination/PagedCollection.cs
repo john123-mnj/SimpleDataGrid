@@ -378,6 +378,16 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         }
 
         _filtered = query.ToList();
+
+        if (maintainPosition && _filtered.Any())
+        {
+            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
+        }
+        else
+        {
+            _currentPage = 0;
+        }
+        RaiseAllChanged();
     }
 
     private static string WildcardToRegex(string pattern)
