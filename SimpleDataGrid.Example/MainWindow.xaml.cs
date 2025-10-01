@@ -101,4 +101,10 @@ public partial class MainWindow : Window
             viewModel.RemoveFilter(key);
         }
     }
+
+    private void AdvancedExamplesButton_Click(object sender, RoutedEventArgs e)
+    {
+        var advancedExamplesWindow = new AdvancedExamplesWindow();
+        advancedExamplesWindow.Show();
+    }
 }

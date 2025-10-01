@@ -28,6 +28,7 @@
                 <TextBox x:Name="SearchTextBox" Width="200" Margin="5" TextChanged="SearchTextBox_TextChanged"/>
                 <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
                 <ProgressBar IsIndeterminate="True" Width="20" Height="20" Margin="5" Visibility="{Binding People.IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Button Content="Advanced Examples" Click="AdvancedExamplesButton_Click" Margin="5"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
                 <TextBlock Text="Search In:" VerticalAlignment="Center" Margin="0,0,5,0"/>
