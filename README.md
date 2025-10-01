@@ -5,16 +5,17 @@
 [![NuGet Version](https://img.shields.io/nuget/v/SimpleDataGrid)](https://www.nuget.org/packages/SimpleDataGrid/)
 [![API Docs](https://github.com/DerekGooding/SimpleDataGrid/actions/workflows/api-docs.yml/badge.svg)](https://github.com/DerekGooding/SimpleDataGrid/actions/workflows/api-docs.yml)
 
-A simple DataGrid for WPF that supports pagination, filtering, and searching.
+A powerful and simple DataGrid for WPF applications, offering seamless pagination, advanced filtering, and robust searching capabilities. Easily integrate and manage large datasets with a modern UI.
 
 ## Features
 
-*   **Pagination:** Easily page through large datasets, with navigation controls and page size selection.
-*   **Filtering:** Filter data based on custom criteria, including named filters for easy management.
-*   **Searching:** Search for data using strings, wildcards, and multi-column search with debouncing.
-*   **Sorting:** Sort data by clicking on column headers.
-*   **Empty State Support:** Provides clear feedback when no items are found after filtering or searching.
-*   **Observability Events:** Exposes events for page changes, filter changes, search changes, and sort changes.
+*   **Pagination:** Easily page through large datasets with comprehensive controls including `NextPage`, `PreviousPage`, `GoToPage`, `GoToFirstPage`, `GoToLastPage`, and `ResetToFirstPage`. Supports configurable page sizes and provides properties like `TotalItems`, `IsEmpty`, `HasItems`, and `IsSourceEmpty` for detailed state management.
+*   **Filtering:** Filter data based on custom criteria using `AddFilter`, `SetFilter`, `RemoveFilter`, and `ClearFilters`. Supports named filters for easy management and retrieval of active filters.
+*   **Searching:** Robust search functionality with `SetSearchAsync` (OR logic for multiple selectors) and `SetSearchAllAsync` (AND logic for multiple selectors). Supports wildcards (`*` and `?`), debouncing for efficient input handling, and an `IsSearching` property to indicate active search operations.
+*   **Sorting:** Sort data by clicking on column headers or programmatically using `SetSort` and `ClearSort`. The `IsSorted` property indicates the current sort status.
+*   **Empty State Support:** Provides clear feedback when no items are found after filtering or searching, leveraging `IsEmpty` and `HasItems` properties.
+*   **Observability Events:** Exposes a rich set of events including `PageSizeChanged`, `SortChanged`, `FilterChanged`, `PageChanged`, `SourceChanged`, and `SearchChanged` for reactive UI updates.
+*   **Resource Management:** Implements `IDisposable` for proper cleanup of resources, particularly for search debouncing mechanisms.
 
 ## Installation
 
@@ -146,6 +147,98 @@ public class Person
     public bool IsActive { get; set; }
     public DateTime HireDate { get; set; }
 }
+
+## Usage Examples
+
+Here are some examples of how to use the `PagedCollection` for advanced filtering and searching:
+
+### Basic Setup
+
+```csharp
+public class MyViewModel
+{
+    public PagedCollection<MyItem> Items { get; }
+
+    public MyViewModel()
+    {
+        Items = new PagedCollection<MyItem>(pageSize: 20);
+        Items.SetSource(LoadMyItems());
+    }
+
+    private List<MyItem> LoadMyItems() => /* ... load your data ... */ new List<MyItem>();
+}
+
+public class MyItem
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+}
+```
+
+### Filtering
+
+```csharp
+// Add a filter for items in a specific category
+Items.SetFilter("CategoryFilter", item => item.Category == "Electronics");
+
+// Remove a filter
+Items.RemoveFilter("CategoryFilter");
+
+// Clear all filters
+Items.ClearFilters();
+```
+
+### Searching (OR Logic)
+
+```csharp
+// Search for a term in Name OR Category, with debouncing
+await Items.SetSearchAsync(
+    selectors: new Func<MyItem, string>[] { item => item.Name, item => item.Category },
+    term: "laptop",
+    useWildcards: true,
+    debounceMilliseconds: 300
+);
+
+// Clear search
+await Items.ClearSearchAsync();
+```
+
+### Searching (AND Logic)
+
+```csharp
+// Search for a term in Name AND Category, with debouncing
+await Items.SetSearchAllAsync(
+    selectors: new Func<MyItem, string>[] { item => item.Name, item => item.Category },
+    term: "gaming",
+    useWildcards: false,
+    debounceMilliseconds: 300
+);
+```
+
+### Sorting
+
+```csharp
+// Sort by Price in ascending order
+Items.SetSort(item => item.Price, ascending: true);
+
+// Clear sorting
+Items.ClearSort();
+```
+
+### Pagination Controls
+
+```csharp
+// Go to the next page
+Items.NextPage();
+
+// Go to a specific page
+Items.GoToPage(5);
+
+// Change page size
+Items.SetPageSize(10);
+```
 
 ## Example Project
 
