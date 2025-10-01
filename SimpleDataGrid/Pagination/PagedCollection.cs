@@ -101,7 +101,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     {
         ArgumentNullException.ThrowIfNull(items);
         _source = items;
-        ApplyFiltering();
+        ApplyFiltering(false);
         SourceChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -125,7 +125,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(filter);
         _filters[key] = filter;
-        ApplyFiltering();
+        ApplyFiltering(true);
         FilterChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -138,7 +138,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         ArgumentNullException.ThrowIfNull(key);
         if (_filters.Remove(key))
         {
-            ApplyFiltering();
+            ApplyFiltering(true);
             FilterChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -156,7 +156,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public void ClearFilters()
     {
         _filters.Clear();
-        ApplyFiltering();
+        ApplyFiltering(false);
         FilterChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -199,7 +199,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         }
         else
         {
-            ApplyFiltering();
+            ApplyFiltering(false);
             SearchChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -230,13 +230,14 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         }
         else
         {
-            ApplyFilteringAll();
+            ApplyFilteringAll(false);
             SearchChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    private void ApplyFilteringAll()
+    private void ApplyFilteringAll(bool maintainPosition = false)
     {
+        var oldFirstItemIndex = _currentPage * _pageSize;
         IEnumerable<T> query = _source;
 
         foreach (var filter in _filters.Values)
@@ -281,7 +282,15 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         }
 
         _filtered = query.ToList();
-        _currentPage = 0;
+
+        if (maintainPosition && _filtered.Any())
+        {
+            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
+        }
+        else
+        {
+            _currentPage = 0;
+        }
         RaiseAllChanged();
     }
 
@@ -293,7 +302,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         _searchSelectors = [];
         _searchTerm = null;
         _useWildcards = false;
-        ApplyFiltering();
+        ApplyFiltering(false);
         SearchChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -308,7 +317,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         ArgumentNullException.ThrowIfNull(selector);
         _sorts.Clear();
         _sorts.Add((x => selector(x)!, ascending));
-        ApplyFiltering();
+        ApplyFiltering(true);
         SortChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -318,12 +327,13 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public void ClearSort()
     {
         _sorts.Clear();
-        ApplyFiltering();
+        ApplyFiltering(false);
         SortChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void ApplyFiltering()
+    private void ApplyFiltering(bool maintainPosition = false)
     {
+        var oldFirstItemIndex = _currentPage * _pageSize;
         IEnumerable<T> query = _source;
 
         foreach (var filter in _filters.Values)
@@ -350,25 +360,14 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             query = query.Where(item => _searchSelectors.Any(selector => matches(selector(item) ?? string.Empty)));
         }
 
-        if (_sorts.Count > 0)
+        if (maintainPosition && _filtered.Any())
         {
-            IOrderedEnumerable<T>? orderedQuery = null;
-            foreach (var (selector, ascending) in _sorts)
-            {
-                if (orderedQuery == null)
-                {
-                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
-                }
-                else
-                {
-                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
-                }
-            }
-            query = orderedQuery ?? query;
+            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
         }
-
-        _filtered = query.ToList();
-        _currentPage = 0;
+        else
+        {
+            _currentPage = 0;
+        }
         RaiseAllChanged();
     }
 
@@ -488,6 +487,14 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public void GoToLastPage()
     {
         GoToPage(TotalPages);
+    }
+
+    /// <summary>
+    /// Resets the current page to the first page.
+    /// </summary>
+    public void ResetToFirstPage()
+    {
+        GoToPage(1);
     }
 
     /// <summary>
