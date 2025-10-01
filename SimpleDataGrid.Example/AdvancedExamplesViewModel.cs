@@ -65,9 +65,18 @@ public class AdvancedExamplesViewModel : INotifyPropertyChanged
 
     public IReadOnlyCollection<string> ActiveFilters => People.GetActiveFilters();
 
+    public string CustomFilterExpression { get; set; } = "Age > 30 && Name.Contains(\"Person 1\")";
+
     public void ClearFilter()
     {
         People.ClearFilters();
+    }
+
+    public void ApplyCustomFilter()
+    {
+        // This is a placeholder. A real implementation would parse the CustomFilterExpression
+        // and create a Func<Person, bool> from it.
+        People.SetFilter("customFilter", p => p.Age > 30);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

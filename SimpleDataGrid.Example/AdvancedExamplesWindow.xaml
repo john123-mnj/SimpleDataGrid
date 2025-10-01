@@ -58,6 +58,10 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBox x:Name="CustomFilterTextBox" Width="300" Margin="5" Text="{Binding CustomFilterExpression, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Content="Apply Custom Filter" Click="ApplyCustomFilterButton_Click" Margin="5"/>
+            </StackPanel>
         </StackPanel>
 
         <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />

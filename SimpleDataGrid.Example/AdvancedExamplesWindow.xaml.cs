@@ -106,4 +106,10 @@ public partial class AdvancedExamplesWindow : Window
             viewModel.RemoveFilter(key);
         }
     }
+
+    private void ApplyCustomFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (AdvancedExamplesViewModel)DataContext;
+        viewModel.ApplyCustomFilter();
+    }
 }
