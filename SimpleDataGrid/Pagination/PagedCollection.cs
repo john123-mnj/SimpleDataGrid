@@ -272,7 +272,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             query = orderedQuery ?? query;
         }
 
-        _filtered = [.. query];
+        _filtered = query.ToList();
         _currentPage = 0;
         RaiseAllChanged();
     }
@@ -358,7 +358,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             query = orderedQuery ?? query;
         }
 
-        _filtered = [.. query];
+        _filtered = query.ToList();
         _currentPage = 0;
         RaiseAllChanged();
     }
@@ -370,10 +370,10 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// Gets the items on the current page.
     /// </summary>
     public IReadOnlyList<T> CurrentPageItems =>
-        [.. _filtered.Skip(_currentPage * _pageSize).Take(_pageSize)];
+        _filtered.Skip(_currentPage * _pageSize).Take(_pageSize).ToList();
 
     IReadOnlyList<object> IPagedCollection.CurrentPageItems => 
-        [..CurrentPageItems.Cast<object>()];
+        CurrentPageItems.Cast<object>().ToList();
 
     /// <summary>
     /// Gets the current page number.
