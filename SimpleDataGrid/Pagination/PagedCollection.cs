@@ -360,15 +360,24 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             query = query.Where(item => _searchSelectors.Any(selector => matches(selector(item) ?? string.Empty)));
         }
 
-        if (maintainPosition && _filtered.Any())
+        if (_sorts.Count > 0)
         {
-            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
+            IOrderedEnumerable<T>? orderedQuery = null;
+            foreach (var (selector, ascending) in _sorts)
+            {
+                if (orderedQuery == null)
+                {
+                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
+                }
+                else
+                {
+                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
+                }
+            }
+            query = orderedQuery ?? query;
         }
-        else
-        {
-            _currentPage = 0;
-        }
-        RaiseAllChanged();
+
+        _filtered = query.ToList();
     }
 
     private static string WildcardToRegex(string pattern)
