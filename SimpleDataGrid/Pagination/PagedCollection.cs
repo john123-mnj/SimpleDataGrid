@@ -387,7 +387,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         {
             _currentPage = 0;
         }
-
+        RaiseAllChanged();
     }
 
     private static string WildcardToRegex(string pattern)
