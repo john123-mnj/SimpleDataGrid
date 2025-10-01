@@ -50,6 +50,21 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public event EventHandler? FilterChanged;
 
     /// <summary>
+    /// Occurs when the current page changes.
+    /// </summary>
+    public event EventHandler? PageChanged;
+
+    /// <summary>
+    /// Occurs when the source collection changes.
+    /// </summary>
+    public event EventHandler? SourceChanged;
+
+    /// <summary>
+    /// Occurs when the search criteria changes.
+    /// </summary>
+    public event EventHandler? SearchChanged;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PagedCollection{T}"/> class.
     /// </summary>
     /// <param name="pageSize">The number of items to display per page.</param>
@@ -67,6 +82,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     {
         _source = items ?? throw new ArgumentNullException(nameof(items));
         ApplyFiltering();
+        SourceChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -132,6 +148,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         _searchTerm = term;
         _useWildcards = useWildcards;
         ApplyFiltering();
+        SearchChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -253,6 +270,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             OnPropertyChanged(nameof(CurrentPage));
             OnPropertyChanged(nameof(HasNext));
             OnPropertyChanged(nameof(HasPrevious));
+            PageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -268,6 +286,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             OnPropertyChanged(nameof(CurrentPage));
             OnPropertyChanged(nameof(HasNext));
             OnPropertyChanged(nameof(HasPrevious));
+            PageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -285,6 +304,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             OnPropertyChanged(nameof(CurrentPage));
             OnPropertyChanged(nameof(HasNext));
             OnPropertyChanged(nameof(HasPrevious));
+            PageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
