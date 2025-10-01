@@ -31,7 +31,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
 
     private readonly Dictionary<string, Func<T, bool>> _filters = [];
     private readonly List<(Func<T, object> selector, bool ascending)> _sorts = [];
-    private Func<T, string>? _searchSelector;
+    private IEnumerable<Func<T, string>> _searchSelectors = [];
     private string? _searchTerm;
     private bool _useWildcards;
     private System.Threading.Timer? _debounceTimer;
@@ -164,7 +164,49 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
     public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
-        _searchSelector = selector;
+        SetSearch([selector], term, useWildcards, debounceMilliseconds);
+    }
+
+    /// <summary>
+    /// Sets the search criteria for the collection, searching across multiple properties.
+    /// </summary>
+    /// <param name="selectors">A collection of functions that return the string representation of the properties to search.</param>
+    /// <param name="term">The search term.</param>
+    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
+    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
+    public void SetSearch(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
+    {
+        _searchSelectors = selectors ?? throw new ArgumentNullException(nameof(selectors));
+        _searchTerm = term;
+        _useWildcards = useWildcards;
+
+        if (debounceMilliseconds > 0)
+        {
+            IsSearching = true;
+            _debounceTimer?.Dispose();
+            _debounceTimer = new System.Threading.Timer(_ =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFiltering);
+                IsSearching = false;
+            }, null, debounceMilliseconds, System.Threading.Timeout.Infinite);
+        }
+        else
+        {
+            ApplyFiltering();
+            SearchChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Sets the search criteria for the collection, requiring all selectors to match the term.
+    /// </summary>
+    /// <param name="selectors">A collection of functions that return the string representation of the properties to search.</param>
+    /// <param name="term">The search term.</param>
+    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
+    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
+    public void SetSearchAll(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
+    {
+        _searchSelectors = selectors ?? throw new ArgumentNullException(nameof(selectors));
         _searchTerm = term;
         _useWildcards = useWildcards;
 
@@ -190,7 +232,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// </summary>
     public void ClearSearch()
     {
-        _searchSelector = null;
+        _searchSelectors = [];
         _searchTerm = null;
         _useWildcards = false;
         ApplyFiltering();
@@ -230,19 +272,23 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             query = query.Where(filter);
         }
 
-        if (!string.IsNullOrWhiteSpace(_searchTerm) && _searchSelector != null)
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _searchSelectors.Any())
         {
+            var term = _searchTerm;
+            Func<string, bool> matches;
+
             if (_useWildcards)
             {
-                var regex = new Regex(WildcardToRegex(_searchTerm), RegexOptions.IgnoreCase);
-                query = query.Where(x => regex.IsMatch(_searchSelector(x)));
+                var regex = new Regex(WildcardToRegex(term), RegexOptions.IgnoreCase);
+                matches = s => regex.IsMatch(s);
             }
             else
             {
-                query = query.Where(x =>
-                    _searchSelector(x)
-                        ?.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) == true);
+                matches = s => s.Contains(term, StringComparison.OrdinalIgnoreCase);
             }
+
+            // OR logic for multi-column search
+            query = query.Where(item => _searchSelectors.Any(selector => matches(selector(item) ?? string.Empty)));
         }
 
         if (_sorts.Count > 0)

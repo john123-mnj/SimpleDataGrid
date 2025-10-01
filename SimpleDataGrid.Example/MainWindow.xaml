@@ -29,6 +29,12 @@
                 <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
                 <ProgressBar IsIndeterminate="True" Width="20" Height="20" Margin="5" Visibility="{Binding People.IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
+                <TextBlock Text="Search In:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <CheckBox Content="Name" IsChecked="{Binding SearchByName}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
+                <CheckBox Content="Email" IsChecked="{Binding SearchByEmail}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
+                <CheckBox Content="Department" IsChecked="{Binding SearchByDepartment}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
                 <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />

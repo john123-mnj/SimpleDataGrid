@@ -22,8 +22,24 @@ public partial class MainWindow : Window
 
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        ApplyMultiColumnSearch();
+    }
+
+    private void SearchOption_Changed(object sender, RoutedEventArgs e)
+    {
+        ApplyMultiColumnSearch();
+    }
+
+    private void ApplyMultiColumnSearch()
+    {
         var viewModel = (MainViewModel)DataContext;
-        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
+        var selectors = new List<Func<Person, string>>();
+
+        if (viewModel.SearchByName) selectors.Add(p => p.Name);
+        if (viewModel.SearchByEmail) selectors.Add(p => p.Email);
+        if (viewModel.SearchByDepartment) selectors.Add(p => p.Department);
+
+        viewModel.People.SetSearch(selectors, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
     }
 
     private void FilterButton_Click(object sender, RoutedEventArgs e)

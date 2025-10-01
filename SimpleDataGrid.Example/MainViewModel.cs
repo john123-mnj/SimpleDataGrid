@@ -9,6 +9,10 @@ public class MainViewModel
     public PagedCollection<Person> People { get; }
     public List<int> PageSizes { get; } = [10, 25, 50, 100];
 
+    public bool SearchByName { get; set; } = true;
+    public bool SearchByEmail { get; set; } = false;
+    public bool SearchByDepartment { get; set; } = false;
+
     public MainViewModel()
     {
         People = new PagedCollection<Person>(10);
@@ -20,7 +24,7 @@ public class MainViewModel
         var people = new List<Person>();
         for (var i = 1; i <= 100; i++)
         {
-            people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50) });
+            people.Add(new Person { Id = i, Name = $"Person {i}", Age = 20 + (i % 50), Email = $"person{i}@example.com", Department = (i % 2 == 0) ? "Sales" : "Marketing" });
         }
         return people;
     }
@@ -58,4 +62,6 @@ public class Person
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public int Age { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
 }
