@@ -6,7 +6,7 @@ using System.Windows;
 namespace SimpleDataGrid.Pagination;
 
 /// <summary>
-/// Represents a collection of items that can be paged, filtered, and searched.
+/// Represents a collection of items that can be paged, filtered, searched, and sorted.
 /// </summary>
 /// <typeparam name="T">The type of items in the collection.</typeparam>
 public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
