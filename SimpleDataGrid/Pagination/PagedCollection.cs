@@ -269,28 +269,16 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             IOrderedEnumerable<T>? orderedQuery = null;
             foreach (var (selector, ascending) in _sorts)
             {
-                if (orderedQuery == null)
-                {
-                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
-                }
-                else
-                {
-                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
-                }
+                orderedQuery = orderedQuery == null
+                    ? ascending ? query.OrderBy(selector) : query.OrderByDescending(selector)
+                    : ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
             }
             query = orderedQuery ?? query;
         }
 
-        _filtered = query.ToList();
+        _filtered = [.. query];
 
-        if (maintainPosition && _filtered.Any())
-        {
-            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
-        }
-        else
-        {
-            _currentPage = 0;
-        }
+        _currentPage = maintainPosition && _filtered.Any() ? Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1) : 0;
         RaiseAllChanged();
     }
 
@@ -365,28 +353,16 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             IOrderedEnumerable<T>? orderedQuery = null;
             foreach (var (selector, ascending) in _sorts)
             {
-                if (orderedQuery == null)
-                {
-                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
-                }
-                else
-                {
-                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
-                }
+                orderedQuery = orderedQuery == null
+                    ? ascending ? query.OrderBy(selector) : query.OrderByDescending(selector)
+                    : ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
             }
             query = orderedQuery ?? query;
         }
 
-        _filtered = query.ToList();
+        _filtered = [.. query];
 
-        if (maintainPosition && _filtered.Any())
-        {
-            _currentPage = Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1);
-        }
-        else
-        {
-            _currentPage = 0;
-        }
+        _currentPage = maintainPosition && _filtered.Any() ? Math.Clamp(oldFirstItemIndex / _pageSize, 0, TotalPages - 1) : 0;
         RaiseAllChanged();
     }
 
@@ -397,10 +373,10 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// Gets the items on the current page.
     /// </summary>
     public IReadOnlyList<T> CurrentPageItems =>
-        _filtered.Skip(_currentPage * _pageSize).Take(_pageSize).ToList();
+        [.. _filtered.Skip(_currentPage * _pageSize).Take(_pageSize)];
 
-    IReadOnlyList<object> IPagedCollection.CurrentPageItems => 
-        CurrentPageItems.Cast<object>().ToList();
+    IReadOnlyList<object> IPagedCollection.CurrentPageItems =>
+        [.. CurrentPageItems.Cast<object>()];
 
     /// <summary>
     /// Gets the current page number.
@@ -495,26 +471,20 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <summary>
     /// Moves to the first page.
     /// </summary>
-    public void GoToFirstPage()
-    {
-        GoToPage(1);
-    }
+    /// <summary>
+    /// Moves to the first page.
+    /// </summary>
+    public void GoToFirstPage() => GoToPage(1);
 
     /// <summary>
     /// Moves to the last page.
     /// </summary>
-    public void GoToLastPage()
-    {
-        GoToPage(TotalPages);
-    }
+    public void GoToLastPage() => GoToPage(TotalPages);
 
     /// <summary>
     /// Resets the current page to the first page.
     /// </summary>
-    public void ResetToFirstPage()
-    {
-        GoToPage(1);
-    }
+    public void ResetToFirstPage() => GoToPage(1);
 
     /// <summary>
     /// Sets the number of items to display per page.

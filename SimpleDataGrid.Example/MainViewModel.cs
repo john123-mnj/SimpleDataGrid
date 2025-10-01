@@ -1,6 +1,4 @@
 using SimpleDataGrid.Pagination;
-using System;
-using System.Collections.Generic;
 
 namespace SimpleDataGrid.Example;
 

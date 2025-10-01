@@ -1,10 +1,5 @@
 using SimpleDataGrid.Pagination;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.IO;
-using System.Reflection;
 
 namespace SimpleDataGrid.Example;
 
@@ -45,41 +40,24 @@ public class AdvancedExamplesViewModel : INotifyPropertyChanged
         return people;
     }
 
-    public void ApplyFilter(int minAge)
-    {
-        People.SetFilter("minAge", p => p.Age >= minAge);
-    }
+    public void ApplyFilter(int minAge) => People.SetFilter("minAge", p => p.Age >= minAge);
 
-    public void ApplyMaxAgeFilter(int maxAge)
-    {
-        People.SetFilter("maxAge", p => p.Age <= maxAge);
-    }
+    public void ApplyMaxAgeFilter(int maxAge) => People.SetFilter("maxAge", p => p.Age <= maxAge);
 
-    public void ApplyNameFilter(string namePrefix)
-    {
-        People.SetFilter("namePrefix", p => p.Name.StartsWith(namePrefix, StringComparison.OrdinalIgnoreCase));
-    }
+    public void ApplyNameFilter(string namePrefix) => People.SetFilter("namePrefix", p => p.Name.StartsWith(namePrefix, StringComparison.OrdinalIgnoreCase));
 
-    public void RemoveFilter(string key)
-    {
-        People.RemoveFilter(key);
-    }
+    public void RemoveFilter(string key) => People.RemoveFilter(key);
 
     public IReadOnlyCollection<string> ActiveFilters => People.GetActiveFilters();
 
     public string CustomFilterExpression { get; set; } = "Age > 30 && Name.Contains(\"Person 1\")";
 
-    public void ClearFilter()
-    {
-        People.ClearFilters();
-    }
+    public void ClearFilter() => People.ClearFilters();
 
-    public void ApplyCustomFilter()
-    {
+    public void ApplyCustomFilter() =>
         // This is a placeholder. A real implementation would parse the CustomFilterExpression
         // and create a Func<Person, bool> from it.
         People.SetFilter("customFilter", p => p.Age > 30);
-    }
 
     public void ExportCurrentPageToCsv()
     {
@@ -90,13 +68,13 @@ public class AdvancedExamplesViewModel : INotifyPropertyChanged
 
         // Add header row
         var headers = typeof(Person).GetProperties().Select(p => p.Name);
-        csv.AppendLine(string.Join(",", headers));
+        csv.AppendJoin(",", headers).AppendLine();
 
         // Add data rows
-        foreach (Person item in items)
+        foreach (var item in items)
         {
             var fields = typeof(Person).GetProperties().Select(p => p.GetValue(item)?.ToString() ?? string.Empty);
-            csv.AppendLine(string.Join(",", fields));
+            csv.AppendJoin(",", fields).AppendLine();
         }
 
         var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CurrentPage.csv");
@@ -105,8 +83,5 @@ public class AdvancedExamplesViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

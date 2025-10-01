@@ -28,10 +28,7 @@ public class PagedDataGrid : DataGrid
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedDataGrid"/> class.
     /// </summary>
-    public PagedDataGrid()
-    {
-        Sorting += OnSorting;
-    }
+    public PagedDataGrid() => Sorting += OnSorting;
 
 
     private static void OnPagedSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

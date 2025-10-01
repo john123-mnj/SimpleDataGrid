@@ -1,6 +1,3 @@
-using SimpleDataGrid.Controls;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,10 +5,7 @@ namespace SimpleDataGrid.Example;
 
 public partial class AdvancedExamplesWindow : Window
 {
-    public AdvancedExamplesWindow()
-    {
-        InitializeComponent();
-    }
+    public AdvancedExamplesWindow() => InitializeComponent();
 
     private void PreviousButton_Click(object sender, RoutedEventArgs e)
     {
@@ -25,15 +19,9 @@ public partial class AdvancedExamplesWindow : Window
         viewModel.People.NextPage();
     }
 
-    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        ApplyMultiColumnSearch();
-    }
+    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyMultiColumnSearch();
 
-    private void SearchOption_Changed(object sender, RoutedEventArgs e)
-    {
-        ApplyMultiColumnSearch();
-    }
+    private void SearchOption_Changed(object sender, RoutedEventArgs e) => ApplyMultiColumnSearch();
 
     private void ApplyMultiColumnSearch()
     {
