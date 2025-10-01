@@ -1,4 +1,3 @@
-
 <Window x:Class="SimpleDataGrid.Example.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -23,81 +22,21 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="SearchTextBox" Width="200" Margin="5" TextChanged="SearchTextBox_TextChanged"/>
-                <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
-                <ProgressBar IsIndeterminate="True" Width="20" Height="20" Margin="5" Visibility="{Binding People.IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <Button Content="Advanced Examples" Click="AdvancedExamplesButton_Click" Margin="5"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                <TextBlock Text="Search In:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <CheckBox Content="Name" IsChecked="{Binding SearchByName}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
-                <CheckBox Content="Email" IsChecked="{Binding SearchByEmail}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
-                <CheckBox Content="Department" IsChecked="{Binding SearchByDepartment}" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" Margin="0,0,5,0"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
-                <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
-                <TextBox x:Name="MaxAgeTextBox" Width="50" Margin="5" />
-                <Button Content="Filter by Max Age" Click="MaxAgeFilterButton_Click" Margin="5" />
-                <TextBox x:Name="NamePrefixTextBox" Width="100" Margin="5" />
-                <Button Content="Filter by Name Prefix" Click="NamePrefixFilterButton_Click" Margin="5" />
-                <Button Content="Clear Filters" Click="ClearFilterButton_Click" Margin="5" />
-            </StackPanel>
-            <ItemsControl ItemsSource="{Binding People.ActiveFilters}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="5,0"/>
-                            <Button Content="Remove" Click="RemoveFilterButton_Click" CommandParameter="{Binding}" Margin="5,0"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+            <TextBox x:Name="SearchTextBox" Width="200" Margin="5" TextChanged="SearchTextBox_TextChanged"/>
+            <Button Content="Search" Click="SearchButton_Click" Margin="5" />
+            <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
+            <Button Content="Advanced Examples" Click="AdvancedExamplesButton_Click" Margin="5"/>
         </StackPanel>
 
         <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
 
-        <Grid Grid.Row="1" Background="#AAFFFFFF" Visibility="{Binding People.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="No items found." FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
-                <TextBlock Text="Try clearing your filters or search terms." FontSize="14" TextAlignment="Center"/>
-            </StackPanel>
-        </Grid>
-
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="First" Click="FirstButton_Click" Margin="5" IsEnabled="{Binding People.HasPrevious}"/>
-            <Button Content="Previous" Click="PreviousButton_Click" Margin="5" IsEnabled="{Binding People.HasPrevious}"/>
-            <TextBlock VerticalAlignment="Center" Margin="5">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="Page {0} of {1}">
-                        <Binding Path="People.CurrentPage"/>
-                        <Binding Path="People.TotalPages"/>
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-            <Button Content="Next" Click="NextButton_Click" Margin="5" IsEnabled="{Binding People.HasNext}"/>
-            <Button Content="Last" Click="LastButton_Click" Margin="5" IsEnabled="{Binding People.HasNext}"/>
-            <TextBlock Text="Go to page:" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <TextBox x:Name="PageTextBox" Width="30" Margin="5,0,0,0"/>
-            <Button Content="Go" Click="GoToPageButton_Click" Margin="5,0,0,0"/>
-            <ComboBox Margin="10,0,0,0" ItemsSource="{Binding PageSizes}" SelectedItem="{Binding People.PageSize}"/>
-            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
-                <TextBlock.Text>
-                    <MultiBinding Converter="{StaticResource ItemCountConverter}">
-                        <Binding Path="People.CurrentPageItems.Count"/>
-                        <Binding Path="People.CurrentPage"/>
-                        <Binding Path="People.TotalItems"/>
-                        <Binding Path="People.PageSize"/>
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
+            <Button Content="Previous" Click="PreviousButton_Click" Margin="5" />
+            <TextBlock Text="{Binding People.CurrentPage}" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Text="/" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding People.TotalPages}" VerticalAlignment="Center" Margin="5" />
+            <Button Content="Next" Click="NextButton_Click" Margin="5" />
         </StackPanel>
     </Grid>
 </Window>
