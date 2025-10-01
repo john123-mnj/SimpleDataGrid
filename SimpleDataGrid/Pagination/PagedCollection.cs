@@ -99,7 +99,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="items">The source collection.</param>
     public void SetSource(IReadOnlyList<T> items)
     {
-        _source = items ?? throw new ArgumentNullException(nameof(items));
+        ArgumentNullException.ThrowIfNull(items);
+        _source = items;
         ApplyFiltering();
         SourceChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -110,6 +111,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="filter">The filter to add.</param>
     public void AddFilter(Func<T, bool> filter)
     {
+        ArgumentNullException.ThrowIfNull(filter);
         SetFilter(Guid.NewGuid().ToString(), filter);
     }
 
@@ -120,6 +122,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="filter">The filter to add or update.</param>
     public void SetFilter(string key, Func<T, bool> filter)
     {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(filter);
         _filters[key] = filter;
         ApplyFiltering();
         FilterChanged?.Invoke(this, EventArgs.Empty);
@@ -131,6 +135,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="key">The key of the filter to remove.</param>
     public void RemoveFilter(string key)
     {
+        ArgumentNullException.ThrowIfNull(key);
         if (_filters.Remove(key))
         {
             ApplyFiltering();
@@ -164,6 +169,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
     public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
+        ArgumentNullException.ThrowIfNull(selector);
         SetSearch([selector], term, useWildcards, debounceMilliseconds);
     }
 
@@ -176,7 +182,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
     public void SetSearch(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
-        _searchSelectors = selectors ?? throw new ArgumentNullException(nameof(selectors));
+        ArgumentNullException.ThrowIfNull(selectors);
+        _searchSelectors = selectors;
         _searchTerm = term;
         _useWildcards = useWildcards;
 
@@ -206,7 +213,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
     public void SetSearchAll(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
-        _searchSelectors = selectors ?? throw new ArgumentNullException(nameof(selectors));
+        ArgumentNullException.ThrowIfNull(selectors);
+        _searchSelectors = selectors;
         _searchTerm = term;
         _useWildcards = useWildcards;
 
@@ -297,6 +305,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="ascending">A value indicating whether to sort in ascending order.</param>
     public void SetSort<TKey>(Func<T, TKey> selector, bool ascending)
     {
+        ArgumentNullException.ThrowIfNull(selector);
         _sorts.Clear();
         _sorts.Add((x => selector(x)!, ascending));
         ApplyFiltering();
