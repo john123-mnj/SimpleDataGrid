@@ -40,5 +40,3 @@ public partial class MainWindow : Window
         viewModel.ClearFilter();
     }
 }
-
-public class PersonPagedDataGrid : PagedDataGrid<Person>;

@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SimpleDataGrid.Example"
+        xmlns:controls="clr-namespace:SimpleDataGrid.Controls;assembly=SimpleDataGrid"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.DataContext>
@@ -27,7 +28,7 @@
             <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5" />
         </StackPanel>
 
-        <local:PersonPagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
+        <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Previous" Click="PreviousButton_Click" Margin="5" />

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SimpleDataGrid.Pagination;
@@ -7,7 +8,7 @@ namespace SimpleDataGrid.Pagination;
 /// Represents a collection of items that can be paged, filtered, and searched.
 /// </summary>
 /// <typeparam name="T">The type of items in the collection.</typeparam>
-public class PagedCollection<T> : INotifyPropertyChanged
+public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
 {
     private readonly int _pageSize;
     private int _currentPage;
@@ -109,6 +110,9 @@ public class PagedCollection<T> : INotifyPropertyChanged
     /// </summary>
     public IReadOnlyList<T> CurrentPageItems =>
         [.. _filtered.Skip(_currentPage * _pageSize).Take(_pageSize)];
+
+    IReadOnlyList<object> IPagedCollection.CurrentPageItems => 
+        [..CurrentPageItems.Cast<object>()];
 
     /// <summary>
     /// Gets the current page number.
