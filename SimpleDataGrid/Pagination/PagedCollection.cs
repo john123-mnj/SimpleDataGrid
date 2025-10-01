@@ -1,7 +1,5 @@
 using System.ComponentModel;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
 
 namespace SimpleDataGrid.Pagination;
 
@@ -9,7 +7,7 @@ namespace SimpleDataGrid.Pagination;
 /// Represents a collection of items that can be paged, filtered, searched, and sorted.
 /// </summary>
 /// <typeparam name="T">The type of items in the collection.</typeparam>
-public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
+public class PagedCollection<T> : IPagedCollection, IDisposable
 {
     private int _pageSize;
     private int _currentPage;
@@ -34,7 +32,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     private IEnumerable<Func<T, string>> _searchSelectors = [];
     private string? _searchTerm;
     private bool _useWildcards;
-    private System.Threading.Timer? _debounceTimer;
+    private CancellationTokenSource? _debounceCts;
     private bool _isSearching;
 
     /// <summary>
@@ -161,26 +159,31 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Sets the search criteria for the collection.
+    /// Sets the search criteria for the collection using a single selector asynchronously.
     /// </summary>
     /// <param name="selector">A function that returns the string representation of the object to search.</param>
-    /// <param name="term">The search term.</param>
-    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
-    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
-    public void SetSearch(Func<T, string> selector, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
+    /// <param name="term">The search term to match.</param>
+    /// <param name="useWildcards">Indicates whether wildcards (*) and (?) should be supported in the search term.</param>
+    /// <param name="debounceMilliseconds">Optional. Number of milliseconds to debounce the search. If 0, the search is applied immediately.</param>
+    /// <returns>A task representing the asynchronous search operation.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="selector"/> is null.</exception>
+    public Task SetSearchAsync(Func<T, string> selector, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
         ArgumentNullException.ThrowIfNull(selector);
-        SetSearch([selector], term, useWildcards, debounceMilliseconds);
+        return SetSearchAsync([selector], term, useWildcards, debounceMilliseconds);
     }
 
     /// <summary>
-    /// Sets the search criteria for the collection, searching across multiple properties.
+    /// Sets the search criteria for the collection across multiple selectors asynchronously.
+    /// Performs an OR search across the specified properties.
     /// </summary>
     /// <param name="selectors">A collection of functions that return the string representation of the properties to search.</param>
-    /// <param name="term">The search term.</param>
-    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
-    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
-    public void SetSearch(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
+    /// <param name="term">The search term to match.</param>
+    /// <param name="useWildcards">Indicates whether wildcards (*) and (?) should be supported in the search term.</param>
+    /// <param name="debounceMilliseconds">Optional. Number of milliseconds to debounce the search. If 0, the search is applied immediately.</param>
+    /// <returns>A task representing the asynchronous search operation.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="selectors"/> is null.</exception>
+    public async Task SetSearchAsync(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
         ArgumentNullException.ThrowIfNull(selectors);
         _searchSelectors = selectors;
@@ -190,12 +193,21 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         if (debounceMilliseconds > 0)
         {
             IsSearching = true;
-            _debounceTimer?.Dispose();
-            _debounceTimer = new System.Threading.Timer(_ =>
+            _debounceCts?.Cancel();
+            _debounceCts = new CancellationTokenSource();
+            var token = _debounceCts.Token;
+
+            try
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFiltering);
+                await Task.Delay(debounceMilliseconds, token);
+                ApplyFiltering(false);
+                SearchChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (TaskCanceledException) { }
+            finally
+            {
                 IsSearching = false;
-            }, null, debounceMilliseconds, System.Threading.Timeout.Infinite);
+            }
         }
         else
         {
@@ -205,13 +217,16 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Sets the search criteria for the collection, requiring all selectors to match the term.
+    /// Sets the search criteria for the collection across multiple selectors asynchronously.
+    /// Performs an AND search, requiring all selectors to match the search term.
     /// </summary>
     /// <param name="selectors">A collection of functions that return the string representation of the properties to search.</param>
-    /// <param name="term">The search term.</param>
-    /// <param name="useWildcards">A value indicating whether to use wildcards in the search term.</param>
-    /// <param name="debounceMilliseconds">Optional. The number of milliseconds to debounce the search. If 0, no debouncing occurs.</param>
-    public void SetSearchAll(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
+    /// <param name="term">The search term to match.</param>
+    /// <param name="useWildcards">Indicates whether wildcards (*) and (?) should be supported in the search term.</param>
+    /// <param name="debounceMilliseconds">Optional. Number of milliseconds to debounce the search. If 0, the search is applied immediately.</param>
+    /// <returns>A task representing the asynchronous search operation.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="selectors"/> is null.</exception>
+    public async Task SetSearchAllAsync(IEnumerable<Func<T, string>> selectors, string? term, bool useWildcards = false, int debounceMilliseconds = 0)
     {
         ArgumentNullException.ThrowIfNull(selectors);
         _searchSelectors = selectors;
@@ -221,12 +236,21 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         if (debounceMilliseconds > 0)
         {
             IsSearching = true;
-            _debounceTimer?.Dispose();
-            _debounceTimer = new System.Threading.Timer(_ =>
+            _debounceCts?.Cancel();
+            _debounceCts = new CancellationTokenSource();
+            var token = _debounceCts.Token;
+
+            try
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFilteringAll);
+                await Task.Delay(debounceMilliseconds, token);
+                ApplyFilteringAll(false);
+                SearchChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (TaskCanceledException) { }
+            finally
+            {
                 IsSearching = false;
-            }, null, debounceMilliseconds, System.Threading.Timeout.Infinite);
+            }
         }
         else
         {
@@ -253,7 +277,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             if (_useWildcards)
             {
                 var regex = new Regex(WildcardToRegex(term), RegexOptions.IgnoreCase);
-                matches = s => regex.IsMatch(s);
+                matches = regex.IsMatch;
             }
             else
             {
@@ -283,15 +307,39 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Clears the search criteria from the collection.
+    /// Clears the search criteria from the collection asynchronously.
+    /// Resets search selectors, search term, and wildcard usage, and applies filtering.
     /// </summary>
-    public void ClearSearch()
+    public async Task ClearSearchAsync(int debounceMilliseconds = 0)
     {
         _searchSelectors = [];
         _searchTerm = null;
         _useWildcards = false;
-        ApplyFiltering(false);
-        SearchChanged?.Invoke(this, EventArgs.Empty);
+
+        if (debounceMilliseconds > 0)
+        {
+            IsSearching = true;
+            _debounceCts?.Cancel();
+            _debounceCts = new CancellationTokenSource();
+            var token = _debounceCts.Token;
+
+            try
+            {
+                await Task.Delay(debounceMilliseconds, token);
+                ApplyFiltering(false);
+                SearchChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (TaskCanceledException) { }
+            finally
+            {
+                IsSearching = false;
+            }
+        }
+        else
+        {
+            ApplyFiltering(false);
+            SearchChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     /// <summary>
@@ -306,6 +354,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         _sorts.Clear();
         _sorts.Add((x => selector(x)!, ascending));
         ApplyFiltering(true);
+
+        OnPropertyChanged(nameof(IsSorted));
         SortChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -316,6 +366,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     {
         _sorts.Clear();
         ApplyFiltering(false);
+
+        OnPropertyChanged(nameof(IsSorted));
         SortChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -337,7 +389,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             if (_useWildcards)
             {
                 var regex = new Regex(WildcardToRegex(term), RegexOptions.IgnoreCase);
-                matches = s => regex.IsMatch(s);
+                matches = regex.IsMatch;
             }
             else
             {
@@ -500,6 +552,8 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
 
         RaiseAllChanged();
         PageSizeChanged?.Invoke(this, EventArgs.Empty);
+
+        OnPropertyChanged(nameof(PageSize));
     }
 
     private void RaiseAllChanged()
@@ -512,6 +566,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(HasItems));
         OnPropertyChanged(nameof(IsSourceEmpty));
+        OnPropertyChanged(nameof(TotalItems));
     }
 
     /// <summary>
@@ -520,4 +575,15 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged(string name) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    /// <summary>
+    /// Disposes the resources used by the PagedCollection.
+    /// </summary>
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = null;
+    }
 }

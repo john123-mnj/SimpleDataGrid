@@ -19,11 +19,11 @@ public partial class AdvancedExamplesWindow : Window
         viewModel.People.NextPage();
     }
 
-    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyMultiColumnSearch();
+    private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e) => await ApplyMultiColumnSearch();
 
-    private void SearchOption_Changed(object sender, RoutedEventArgs e) => ApplyMultiColumnSearch();
+    private async void SearchOption_Changed(object sender, RoutedEventArgs e) => await ApplyMultiColumnSearch();
 
-    private void ApplyMultiColumnSearch()
+    private async Task ApplyMultiColumnSearch()
     {
         var viewModel = (AdvancedExamplesViewModel)DataContext;
         var selectors = new List<Func<Person, string>>();
@@ -32,7 +32,19 @@ public partial class AdvancedExamplesWindow : Window
         if (viewModel.SearchByEmail) selectors.Add(p => p.Email);
         if (viewModel.SearchByDepartment) selectors.Add(p => p.Department);
 
-        viewModel.People.SetSearch(selectors, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
+        if (selectors.Count != 0)
+        {
+            await viewModel.People.SetSearchAsync(
+                selectors,
+                SearchTextBox.Text,
+                WildcardCheckBox.IsChecked == true,
+                300
+            );
+        }
+        else
+        {
+            await viewModel.People.ClearSearchAsync();
+        }
     }
 
     private void FilterButton_Click(object sender, RoutedEventArgs e)
@@ -51,16 +63,10 @@ public partial class AdvancedExamplesWindow : Window
     }
 
     private void FirstButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (AdvancedExamplesViewModel)DataContext;
-        viewModel.People.GoToFirstPage();
-    }
+        => ((AdvancedExamplesViewModel)DataContext).People.GoToFirstPage();
 
     private void LastButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (AdvancedExamplesViewModel)DataContext;
-        viewModel.People.GoToLastPage();
-    }
+        => ((AdvancedExamplesViewModel)DataContext).People.GoToLastPage();
 
     private void GoToPageButton_Click(object sender, RoutedEventArgs e)
     {
@@ -81,10 +87,7 @@ public partial class AdvancedExamplesWindow : Window
     }
 
     private void NamePrefixFilterButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (AdvancedExamplesViewModel)DataContext;
-        viewModel.ApplyNameFilter(NamePrefixTextBox.Text);
-    }
+        => ((AdvancedExamplesViewModel)DataContext).ApplyNameFilter(NamePrefixTextBox.Text);
 
     private void RemoveFilterButton_Click(object sender, RoutedEventArgs e)
     {
@@ -96,14 +99,8 @@ public partial class AdvancedExamplesWindow : Window
     }
 
     private void ApplyCustomFilterButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (AdvancedExamplesViewModel)DataContext;
-        viewModel.ApplyCustomFilter();
-    }
+        => ((AdvancedExamplesViewModel)DataContext).ApplyCustomFilter();
 
     private void ExportToCsvButton_Click(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (AdvancedExamplesViewModel)DataContext;
-        viewModel.ExportCurrentPageToCsv();
-    }
+        => ((AdvancedExamplesViewModel)DataContext).ExportCurrentPageToCsv();
 }

@@ -32,7 +32,7 @@ jobs:
           echo "HTTP Status Code: $HTTP_CODE"
           cat curl_output.txt
           if [ "$HTTP_CODE" -eq 200 ]; then
-            LATEST_VERSION=$(cat curl_output.txt | jq -r '.versions[0]')
+            LATEST_VERSION=$(cat curl_output.txt | jq -r '.versions[-1]')
           else
             echo "Curl failed or returned non-200 status. Assuming no previous version."
             LATEST_VERSION=""

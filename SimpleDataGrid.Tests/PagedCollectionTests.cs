@@ -245,7 +245,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "");
+        pagedCollection.SetSearchAsync(x => x, "");
 
         // Assert
         Assert.HasCount(3, pagedCollection.CurrentPageItems);
@@ -261,7 +261,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "xyz");
+        pagedCollection.SetSearchAsync(x => x, "xyz");
 
         // Assert
         Assert.HasCount(0, pagedCollection.CurrentPageItems);
@@ -276,7 +276,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "an");
+        pagedCollection.SetSearchAsync(x => x, "an");
 
         // Assert
         Assert.HasCount(1, pagedCollection.CurrentPageItems);
@@ -292,11 +292,11 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "*a*", true);
+        pagedCollection.SetSearchAsync(x => x, "*a*", true);
 
         // Assert
-        Assert.HasCount(2, pagedCollection.CurrentPageItems);
-        CollectionAssert.AreEqual(new List<string> { "apple", "banana" }, pagedCollection.CurrentPageItems.ToList());
+        Assert.HasCount(3, pagedCollection.CurrentPageItems);
+        CollectionAssert.AreEqual(new List<string> { "apple", "banana", "date" }, pagedCollection.CurrentPageItems.ToList());
     }
 
     [TestMethod]
@@ -308,7 +308,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "appl?", true);
+        pagedCollection.SetSearchAsync(x => x, "appl?", true);
 
         // Assert
         Assert.HasCount(2, pagedCollection.CurrentPageItems);
@@ -324,7 +324,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act
-        pagedCollection.SetSearch(x => x, "apple");
+        pagedCollection.SetSearchAsync(x => x, "apple");
 
         // Assert
         Assert.HasCount(1, pagedCollection.CurrentPageItems);
@@ -332,7 +332,7 @@ public class PagedCollectionTests
     }
 
     [TestMethod]
-    public void SetSearch_MultiColumn_ORLogic_ReturnsMatchingItems()
+    public async Task SetSearch_MultiColumn_ORLogic_ReturnsMatchingItems()
     {
         // Arrange
         var source = new List<Person>
@@ -345,7 +345,7 @@ public class PagedCollectionTests
         pagedCollection.SetSource(source);
 
         // Act: Search for "HR" in Name or Department
-        pagedCollection.SetSearch([p => p.Name, p => p.Department], "HR");
+        await pagedCollection.SetSearchAsync([p => p.Name, p => p.Department], "HR");
 
         // Assert
         Assert.HasCount(2, pagedCollection.CurrentPageItems);
@@ -403,13 +403,13 @@ public class PagedCollectionTests
     }
 
     [TestMethod]
-    public void SetSearchAll_WithNullSelectors_ThrowsArgumentNullException()
+    public async Task SetSearchAll_WithNullSelectors_ThrowsArgumentNullException()
     {
         // Arrange
         var pagedCollection = new PagedCollection<string>(10);
 
         // Act
-        Assert.ThrowsExactly<ArgumentNullException>(() => pagedCollection.SetSearchAll(null!, "term"));
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(() => pagedCollection.SetSearchAllAsync(null!, "term"));
     }
 
     [TestMethod]
@@ -646,7 +646,7 @@ public class PagedCollectionTests
         };
 
         // Act
-        pagedCollection.SetSearch(x => x, "a", false, 10);
+        pagedCollection.SetSearchAsync(x => x, "a", false, 10);
         System.Threading.Thread.Sleep(20); // Allow debounce timer to start
 
         // Assert

@@ -22,13 +22,13 @@ public partial class MainWindow : Window
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         var viewModel = (MainViewModel)DataContext;
-        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
+        viewModel.People.SetSearchAsync(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true, 300);
     }
 
     private void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         var viewModel = (MainViewModel)DataContext;
-        viewModel.People.SetSearch(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
+        viewModel.People.SetSearchAsync(p => p.Name, SearchTextBox.Text, WildcardCheckBox.IsChecked == true);
     }
 
     private void AdvancedExamplesButton_Click(object sender, RoutedEventArgs e)
