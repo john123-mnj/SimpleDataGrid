@@ -216,15 +216,65 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
             _debounceTimer?.Dispose();
             _debounceTimer = new System.Threading.Timer(_ =>
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFiltering);
+                System.Windows.Application.Current.Dispatcher.Invoke(ApplyFilteringAll);
                 IsSearching = false;
             }, null, debounceMilliseconds, System.Threading.Timeout.Infinite);
         }
         else
         {
-            ApplyFiltering();
+            ApplyFilteringAll();
             SearchChanged?.Invoke(this, EventArgs.Empty);
         }
+    }
+
+    private void ApplyFilteringAll()
+    {
+        IEnumerable<T> query = _source;
+
+        foreach (var filter in _filters.Values)
+        {
+            query = query.Where(filter);
+        }
+
+        if (!string.IsNullOrWhiteSpace(_searchTerm) && _searchSelectors.Any())
+        {
+            var term = _searchTerm;
+            Func<string, bool> matches;
+
+            if (_useWildcards)
+            {
+                var regex = new Regex(WildcardToRegex(term), RegexOptions.IgnoreCase);
+                matches = s => regex.IsMatch(s);
+            }
+            else
+            {
+                matches = s => s.Contains(term, StringComparison.OrdinalIgnoreCase);
+            }
+
+            // AND logic for multi-column search
+            query = query.Where(item => _searchSelectors.All(selector => matches(selector(item) ?? string.Empty)));
+        }
+
+        if (_sorts.Count > 0)
+        {
+            IOrderedEnumerable<T>? orderedQuery = null;
+            foreach (var (selector, ascending) in _sorts)
+            {
+                if (orderedQuery == null)
+                {
+                    orderedQuery = ascending ? query.OrderBy(selector) : query.OrderByDescending(selector);
+                }
+                else
+                {
+                    orderedQuery = ascending ? orderedQuery.ThenBy(selector) : orderedQuery.ThenByDescending(selector);
+                }
+            }
+            query = orderedQuery ?? query;
+        }
+
+        _filtered = [.. query];
+        _currentPage = 0;
+        RaiseAllChanged();
     }
 
     /// <summary>
