@@ -8,7 +8,7 @@
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 	<PackageId>SimpleDataGrid</PackageId>
-	<Version>0.8.1</Version>
+	<Version>0.9.0</Version>
 	<Authors>Derek Gooding</Authors>
 	<Company>Derek Gooding</Company>
 	<PackageDescription>A powerful and simple DataGrid for WPF applications, offering seamless pagination, advanced filtering, and robust searching capabilities. Easily integrate and manage large datasets with a modern UI.</PackageDescription>
