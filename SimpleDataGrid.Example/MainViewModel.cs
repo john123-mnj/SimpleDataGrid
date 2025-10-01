@@ -1,4 +1,6 @@
 using SimpleDataGrid.Pagination;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleDataGrid.Example;
 
@@ -24,9 +26,25 @@ public class MainViewModel
 
     public void ApplyFilter(int minAge)
     {
-        People.ClearFilters();
-        People.AddFilter(p => p.Age >= minAge);
+        People.SetFilter("minAge", p => p.Age >= minAge);
     }
+
+    public void ApplyMaxAgeFilter(int maxAge)
+    {
+        People.SetFilter("maxAge", p => p.Age <= maxAge);
+    }
+
+    public void ApplyNameFilter(string namePrefix)
+    {
+        People.SetFilter("namePrefix", p => p.Name.StartsWith(namePrefix, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public void RemoveFilter(string key)
+    {
+        People.RemoveFilter(key);
+    }
+
+    public IReadOnlyCollection<string> ActiveFilters => People.GetActiveFilters();
 
     public void ClearFilter()
     {

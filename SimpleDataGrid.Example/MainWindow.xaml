@@ -22,14 +22,36 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
-            <Button Content="Search" Click="SearchButton_Click" Margin="5" />
-            <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
-
-            <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
-            <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
-            <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5" />
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="SearchTextBox" Width="200" Margin="5" />
+                <Button Content="Search" Click="SearchButton_Click" Margin="5" />
+                <CheckBox x:Name="WildcardCheckBox" Content="Use Wildcards" VerticalAlignment="Center" Margin="5" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="MinAgeTextBox" Width="50" Margin="5" />
+                <Button Content="Filter by Min Age" Click="FilterButton_Click" Margin="5" />
+                <TextBox x:Name="MaxAgeTextBox" Width="50" Margin="5" />
+                <Button Content="Filter by Max Age" Click="MaxAgeFilterButton_Click" Margin="5" />
+                <TextBox x:Name="NamePrefixTextBox" Width="100" Margin="5" />
+                <Button Content="Filter by Name Prefix" Click="NamePrefixFilterButton_Click" Margin="5" />
+                <Button Content="Clear Filters" Click="ClearFilterButton_Click" Margin="5" />
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding People.ActiveFilters}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="5,0"/>
+                            <Button Content="Remove" Click="RemoveFilterButton_Click" CommandParameter="{Binding}" Margin="5,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
         <controls:PagedDataGrid x:Name="PagedDataGrid" Grid.Row="1" PagedSource="{Binding People}" AutoGenerateColumns="True" />

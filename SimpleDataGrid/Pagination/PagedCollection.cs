@@ -19,7 +19,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     private IReadOnlyList<T> _source = [];
     private IReadOnlyList<T> _filtered = [];
 
-    private readonly List<Func<T, bool>> _filters = [];
+    private readonly Dictionary<string, Func<T, bool>> _filters = [];
     private readonly List<(Func<T, object> selector, bool ascending)> _sorts = [];
     private Func<T, string>? _searchSelector;
     private string? _searchTerm;
@@ -34,6 +34,11 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// Occurs when the sorting changes.
     /// </summary>
     public event EventHandler? SortChanged;
+
+    /// <summary>
+    /// Occurs when the filter changes.
+    /// </summary>
+    public event EventHandler? FilterChanged;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PagedCollection{T}"/> class.
@@ -61,9 +66,40 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     /// <param name="filter">The filter to add.</param>
     public void AddFilter(Func<T, bool> filter)
     {
-        _filters.Add(filter);
-        ApplyFiltering();
+        SetFilter(Guid.NewGuid().ToString(), filter);
     }
+
+    /// <summary>
+    /// Adds or updates a filter in the collection.
+    /// </summary>
+    /// <param name="key">The key of the filter.</param>
+    /// <param name="filter">The filter to add or update.</param>
+    public void SetFilter(string key, Func<T, bool> filter)
+    {
+        _filters[key] = filter;
+        ApplyFiltering();
+        FilterChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Removes a filter from the collection.
+    /// </summary>
+    /// <param name="key">The key of the filter to remove.</param>
+    public void RemoveFilter(string key)
+    {
+        if (_filters.Remove(key))
+        {
+            ApplyFiltering();
+            FilterChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Gets the keys of the active filters.
+    /// </summary>
+    /// <returns>A read-only collection of the active filter keys.</returns>
+    public IReadOnlyCollection<string> GetActiveFilters() => _filters.Keys;
+
 
     /// <summary>
     /// Clears all filters from the collection.
@@ -72,6 +108,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     {
         _filters.Clear();
         ApplyFiltering();
+        FilterChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -116,7 +153,7 @@ public class PagedCollection<T> : IPagedCollection, INotifyPropertyChanged
     {
         IEnumerable<T> query = _source;
 
-        foreach (var filter in _filters)
+        foreach (var filter in _filters.Values)
         {
             query = query.Where(filter);
         }

@@ -1,5 +1,6 @@
 using SimpleDataGrid.Controls;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SimpleDataGrid.Example;
 
@@ -58,6 +59,30 @@ public partial class MainWindow : Window
         if (int.TryParse(PageTextBox.Text, out var page))
         {
             viewModel.People.GoToPage(page);
+        }
+    }
+
+    private void MaxAgeFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        if (int.TryParse(MaxAgeTextBox.Text, out var maxAge))
+        {
+            viewModel.ApplyMaxAgeFilter(maxAge);
+        }
+    }
+
+    private void NamePrefixFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        viewModel.ApplyNameFilter(NamePrefixTextBox.Text);
+    }
+
+    private void RemoveFilterButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = (MainViewModel)DataContext;
+        if (sender is Button button && button.CommandParameter is string key)
+        {
+            viewModel.RemoveFilter(key);
         }
     }
 }
